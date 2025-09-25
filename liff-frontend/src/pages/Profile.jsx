@@ -38,7 +38,7 @@ export default function Profile() {
       <div className="flex flex-col items-center">
         <div className="w-24 h-24 rounded-full bg-white border border-gray-300 mb-4"></div>
         <h2 className="text-xl font-bold mb-1">{info.memberName}</h2>
-        <p className="text-sm text-gray-500 mb-4">📱 {info.phone}</p>
+        <p className="text-sm text-gray-500 mb-4">{info.phone || "－"}</p>
       </div>
       <div className="space-y-2">
         <div className="flex justify-between">
