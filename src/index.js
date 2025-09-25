@@ -36,28 +36,28 @@ async function handleEvent(event) {
   const userId = event.source.userId;
   const message = event.message.text.trim();
 
-  if (message === "查詢剩餘次數") {
-    try {
-      const member = await getByLineId(userId);
-      if (!member) {
-        return client.replyMessage(event.replyToken, {
-          type: "text",
-          text: "查無會員，請先綁定會員。",
-        });
-      }
+  let member = await getByLineId(userId);
 
-      const replyText = `${member.memberName} 您好\n目前剩餘配送次數為：${member.remainDelivery} 次`;
-      return client.replyMessage(event.replyToken, {
-        type: "text",
-        text: replyText,
-      });
+  if (!member) {
+    try {
+      const profile = await client.getProfile(userId);
+      const memberId = await MemberService.createMember(userId, profile.displayName, "");
+      member = await MemberService.getByLineId(userId);
     } catch (err) {
-      console.error("查詢 Google Sheets 錯誤", err);
+      console.error("自動綁定會員失敗", err);
       return client.replyMessage(event.replyToken, {
         type: "text",
-        text: "查詢失敗，請稍後再試。",
+        text: "無法綁定會員，請稍後再試。",
       });
     }
+  }
+
+  if (message === "查詢剩餘次數") {
+    const replyText = `${member.memberName} 您好\n目前剩餘配送次數為：${member.remainDelivery} 次`;
+    return client.replyMessage(event.replyToken, {
+      type: "text",
+      text: replyText,
+    });
   }
 
   return client.replyMessage(event.replyToken, {

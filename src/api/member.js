@@ -3,17 +3,38 @@ const router = express.Router();
 const MemberService = require("../services/memberService");
 
 router.post("/create", async (req, res) => {
-  const { memberName, phone } = req.body;
+  const { lineId, memberName, phone } = req.body;
   try {
     const exists = await MemberService.checkMemberExists(memberName, phone);
     if (exists) {
       return res.status(400).json({ success: false, message: "會員已存在" });
     }
-    const memberId = await MemberService.createMember(memberName, phone);
+    const memberId = await MemberService.createMember(lineId, memberName, phone);
     res.status(201).json({ success: true, memberId });
   } catch (err) {
     console.error("新增會員失敗", err);
     res.status(500).json({ success: false, message: "新增會員失敗" });
+  }
+});
+
+router.post("/login-or-bind", async (req, res) => {
+  const { lineId, displayName } = req.body;
+  if (!lineId || !displayName) {
+    return res.status(400).json({ success: false, message: "缺少 lineId 或 displayName" });
+  }
+
+  try {
+    const existing = await MemberService.getByLineId(lineId);
+    if (existing) {
+      return res.status(200).json({ success: true, member: existing });
+    }
+
+    const memberId = await MemberService.createMember(lineId, displayName, "");
+    const member = await MemberService.getByLineId(lineId);
+    return res.status(201).json({ success: true, member });
+  } catch (err) {
+    console.error("登入或綁定會員失敗", err);
+    res.status(500).json({ success: false, message: "處理失敗" });
   }
 });
 
