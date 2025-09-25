@@ -49,6 +49,20 @@ router.get("/:memberId", async (req, res) => {
   }
 });
 
+router.get("/by-line/:lineId", async (req, res) => {
+  const { lineId } = req.params;
+  try {
+    const member = await MemberService.getByLineId(lineId);
+    if (!member) {
+      return res.status(404).json({ success: false, message: "查無會員" });
+    }
+    res.json(member);
+  } catch (err) {
+    console.error("查詢會員失敗", err);
+    res.status(500).json({ success: false });
+  }
+});
+
 router.patch("/:id", async (req, res) => {
   try {
     await MemberService.updateMember(req.params.id, req.body);

@@ -1,29 +1,35 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import liff from "@line/liff";
 
 export default function Profile() {
-  const { memberId } = useParams();
   const [info, setInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMember = async () => {
       try {
-        const res = await fetch(`/api/members/${memberId}`);
-        if (!res.ok) throw new Error("找不到會員資料");
+        await liff.ready;
+        const profile = await liff.getProfile();
+        const lineId = profile.userId;
+
+        const res = await fetch(`/api/members/by-line/${lineId}`);
+        if (!res.ok) throw new Error("查無會員");
         const data = await res.json();
         setInfo(data);
       } catch (err) {
-        console.error(err);
+        console.error("查詢會員失敗：", err);
         setInfo(null);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchMember();
-  }, [memberId]);
+  }, []);
 
-  if (!info) {
-    return <div className="text-center mt-12">載入中...</div>;
-  }
+  if (loading) return <div className="text-center mt-12">載入中...</div>;
+
+  if (!info) return <div className="text-center mt-12 text-red-500">查無會員資訊</div>;
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-base-200 p-6 rounded-lg shadow-md">
