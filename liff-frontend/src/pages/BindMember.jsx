@@ -11,7 +11,7 @@ export default function BindMemberForm() {
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/members/create", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE}/api/members/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,8 +22,15 @@ export default function BindMemberForm() {
         }),
       });
 
-      if (!res.ok) throw new Error("綁定失敗，請重試");
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("後端回傳非 JSON：" + text);
+      }
+
+      if (!res.ok) throw new Error(data.message || "綁定失敗，請重試");
 
       localStorage.setItem("member", JSON.stringify(data.member));
 
