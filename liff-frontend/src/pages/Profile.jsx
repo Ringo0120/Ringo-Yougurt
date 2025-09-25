@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import liff from "@line/liff";
 import { Pencil } from "lucide-react";
+import Alert from "../components/Alert";
 
 const apiBase = import.meta.env.VITE_API_BASE;
 
@@ -51,6 +52,7 @@ export default function Profile() {
       setShowAlert(true);
       setEditing(false);
       setInfo((prev) => ({ ...prev, ...form }));
+      setTimeout(() => setShowAlert(false), 3000);
     } catch (err) {
       console.error("更新會員失敗：", err);
       alert("更新失敗，請稍後再試。");
@@ -63,26 +65,7 @@ export default function Profile() {
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-base-200 p-6 rounded-lg shadow-md">
-      {showAlert && (
-        <div
-          role="alert"
-          className="alert"
-          style={{ backgroundColor: "#72a2dc", color: "#e5e9f0" }}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            className="h-6 w-6 shrink-0 stroke-current">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>會員資料已成功更新！</span>
-        </div>
-      )}
+      {showAlert && <Alert message="會員資料已成功更新！" />}
 
       <div className="flex flex-col items-center">
         <div className="w-24 h-24 rounded-full bg-white border border-gray-300 mb-4"></div>
@@ -95,7 +78,7 @@ export default function Profile() {
                 <Pencil className="w-4 h-4 text-gray-500" />
               </button>
             </div>
-            <p className="text-sm text-gray-500 mb-4">📱 {info.phone || "－"}</p>
+            <p className="text-sm text-gray-500 mb-4">{info.phone || "－"}</p>
           </>
         ) : (
           <>
