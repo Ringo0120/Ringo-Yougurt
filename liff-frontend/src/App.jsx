@@ -9,6 +9,13 @@ function App() {
       try {
         await liff.init({ liffId: import.meta.env.VITE_LIFF_ID });
         console.log("LIFF 初始化完成");
+
+        if (!liff.isLoggedIn()) {
+          console.log("尚未登入，導向 LINE Login");
+          liff.login();
+          return;
+        }
+
         const profile = await liff.getProfile();
         console.log("使用者資料：", profile);
       } catch (err) {

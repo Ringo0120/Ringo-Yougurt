@@ -1,3 +1,4 @@
+const cors = require("cors");
 const express = require("express");
 const { middleware, Client } = require("@line/bot-sdk");
 require("dotenv").config();
@@ -9,6 +10,7 @@ const config = {
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const client = new Client(config);
 const memberApi = require("./api/member");
