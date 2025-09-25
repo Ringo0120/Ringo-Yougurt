@@ -1,0 +1,69 @@
+const express = require("express");
+const { middleware, Client } = require("@line/bot-sdk");
+require("dotenv").config();
+
+const config = {
+  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+  channelSecret: process.env.CHANNEL_SECRET,
+};
+
+const app = express();
+app.use(express.json());
+
+const client = new Client(config);
+const memberApi = require("./api/member");
+const { getByLineId } = require("./services/memberService");
+
+app.use("/api/members", memberApi);
+app.use("/webhook", middleware(config));
+
+app.post("/webhook", (req, res) => {
+  Promise.all(req.body.events.map(handleEvent))
+    .then((result) => res.json(result))
+    .catch((err) => {
+      console.error("處理 webhook 發生錯誤：", err);
+      res.status(500).end();
+    });
+});
+
+async function handleEvent(event) {
+  if (event.type !== "message" || event.message.type !== "text") {
+    return Promise.resolve(null);
+  }
+
+  const userId = event.source.userId;
+  const message = event.message.text.trim();
+
+  if (message === "查詢剩餘次數") {
+    try {
+      const member = await getByLineId(userId);
+      if (!member) {
+        return client.replyMessage(event.replyToken, {
+          type: "text",
+          text: "查無會員，請先綁定會員。",
+        });
+      }
+
+      const replyText = `${member.memberName} 您好\n目前剩餘配送次數為：${member.remainDelivery} 次`;
+      return client.replyMessage(event.replyToken, {
+        type: "text",
+        text: replyText,
+      });
+    } catch (err) {
+      console.error("查詢 Google Sheets 錯誤", err);
+      return client.replyMessage(event.replyToken, {
+        type: "text",
+        text: "查詢失敗，請稍後再試。",
+      });
+    }
+  }
+
+  return client.replyMessage(event.replyToken, {
+    type: "text",
+    text: `你說了：${message}`,
+  });
+}
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`yougurt backend is running on port ${process.env.PORT || 3000}`);
+});
