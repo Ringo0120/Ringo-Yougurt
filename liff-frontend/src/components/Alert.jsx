@@ -1,4 +1,3 @@
-// components/Alert.jsx
 export default function Alert({ message }) {
   return (
     <div
