@@ -52,7 +52,6 @@ export default function Profile() {
       setShowAlert(true);
       setEditing(false);
       setInfo((prev) => ({ ...prev, ...form }));
-      setTimeout(() => setShowAlert(false), 3000);
     } catch (err) {
       console.error("更新會員失敗：", err);
       alert("更新失敗，請稍後再試。");
