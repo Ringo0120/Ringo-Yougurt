@@ -6,6 +6,8 @@ const apiBase = import.meta.env.VITE_API_BASE;
 export default function Profile() {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({ memberName: "", phone: "" });
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -18,6 +20,7 @@ export default function Profile() {
         if (!res.ok) throw new Error("查無會員");
         const data = await res.json();
         setInfo(data);
+        setForm({ memberName: data.memberName, phone: data.phone || "" });
       } catch (err) {
         console.error("查詢會員失敗：", err);
         setInfo(null);
@@ -29,6 +32,27 @@ export default function Profile() {
     fetchMember();
   }, []);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!info?.memberId) return;
+    try {
+      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberName: form.memberName, phone: form.phone }),
+      });
+      if (!res.ok) throw new Error("更新失敗");
+      setSuccess(true);
+    } catch (err) {
+      console.error("更新會員失敗：", err);
+      alert("更新失敗，請稍後再試。");
+    }
+  };
+
   if (loading) return <div className="text-center mt-12">載入中...</div>;
 
   if (!info) return <div className="text-center mt-12 text-red-500">查無會員資訊</div>;
@@ -37,10 +61,27 @@ export default function Profile() {
     <div className="max-w-md mx-auto mt-10 bg-base-200 p-6 rounded-lg shadow-md">
       <div className="flex flex-col items-center">
         <div className="w-24 h-24 rounded-full bg-white border border-gray-300 mb-4"></div>
-        <h2 className="text-xl font-bold mb-1">{info.memberName}</h2>
-        <p className="text-sm text-gray-500 mb-4">{info.phone || "－"}</p>
+        <input
+          type="text"
+          name="memberName"
+          className="input input-bordered w-full mb-2"
+          value={form.memberName}
+          onChange={handleChange}
+        />
+        <input
+          type="tel"
+          name="phone"
+          className="input input-bordered w-full"
+          placeholder="輸入電話"
+          value={form.phone}
+          onChange={handleChange}
+        />
+        <button className="btn btn-primary mt-4 w-full" onClick={handleSubmit}>
+          儲存修改
+        </button>
+        {success && <p className="text-green-600 mt-2">✅ 修改成功</p>}
       </div>
-      <div className="space-y-2">
+      <div className="mt-6 space-y-2">
         <div className="flex justify-between">
           <span>訂購方案</span>
           <span className="font-semibold">{info.orderType || "－"}</span>
