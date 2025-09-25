@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import liff from "@line/liff";
 
+const apiBase = import.meta.env.VITE_API_BASE_URL;
+
 export default function Profile() {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ export default function Profile() {
         const profile = await liff.getProfile();
         const lineId = profile.userId;
 
-        const res = await fetch(`/api/members/by-line/${lineId}`);
+        const res = await fetch(`${apiBase}/api/members/by-line/${lineId}`);
         if (!res.ok) throw new Error("查無會員");
         const data = await res.json();
         setInfo(data);
