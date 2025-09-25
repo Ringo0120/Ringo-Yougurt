@@ -13,13 +13,16 @@ export default function Profile() {
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
+    const userId = localStorage.getItem("lineUserId");
+    if (!userId) {
+      console.warn("未登入，跳回首頁");
+      window.location.href = "/";
+      return;
+    }
+
     const fetchMember = async () => {
       try {
-        await liff.ready;
-        const profile = await liff.getProfile();
-        const lineId = profile.userId;
-
-        const res = await fetch(`${apiBase}/api/members/by-line/${lineId}`);
+        const res = await fetch(`${apiBase}/api/members/by-line/${userId}`);
         if (!res.ok) throw new Error("查無會員");
         const data = await res.json();
         setInfo(data);

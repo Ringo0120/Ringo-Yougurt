@@ -10,7 +10,8 @@ router.post("/create", async (req, res) => {
       return res.status(400).json({ success: false, message: "會員已存在" });
     }
     const memberId = await MemberService.createMember(lineId, memberName, phone);
-    res.status(201).json({ success: true, memberId });
+    const member = await MemberService.getByLineId(lineId);
+    res.status(201).json({ success: true, member });
   } catch (err) {
     console.error("新增會員失敗", err);
     res.status(500).json({ success: false, message: "新增會員失敗" });
