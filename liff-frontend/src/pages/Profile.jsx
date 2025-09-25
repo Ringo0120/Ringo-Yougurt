@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import liff from "@line/liff";
+import { Pencil } from "lucide-react";
 
 const apiBase = import.meta.env.VITE_API_BASE;
 
 export default function Profile() {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ memberName: "", phone: "" });
-  const [success, setSuccess] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -46,7 +48,9 @@ export default function Profile() {
         body: JSON.stringify({ memberName: form.memberName, phone: form.phone }),
       });
       if (!res.ok) throw new Error("更新失敗");
-      setSuccess(true);
+      setShowAlert(true);
+      setEditing(false);
+      setInfo((prev) => ({ ...prev, ...form }));
     } catch (err) {
       console.error("更新會員失敗：", err);
       alert("更新失敗，請稍後再試。");
@@ -59,28 +63,64 @@ export default function Profile() {
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-base-200 p-6 rounded-lg shadow-md">
+      {showAlert && (
+        <div
+          role="alert"
+          className="alert"
+          style={{ backgroundColor: "#72a2dc", color: "#e5e9f0" }}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="h-6 w-6 shrink-0 stroke-current">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>會員資料已成功更新！</span>
+        </div>
+      )}
+
       <div className="flex flex-col items-center">
         <div className="w-24 h-24 rounded-full bg-white border border-gray-300 mb-4"></div>
-        <input
-          type="text"
-          name="memberName"
-          className="input input-bordered w-full mb-2"
-          value={form.memberName}
-          onChange={handleChange}
-        />
-        <input
-          type="tel"
-          name="phone"
-          className="input input-bordered w-full"
-          placeholder="輸入電話"
-          value={form.phone}
-          onChange={handleChange}
-        />
-        <button className="btn btn-primary mt-4 w-full" onClick={handleSubmit}>
-          儲存修改
-        </button>
-        {success && <p className="text-green-600 mt-2">✅ 修改成功</p>}
+
+        {!editing ? (
+          <>
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="text-xl font-bold">{info.memberName}</h2>
+              <button onClick={() => setEditing(true)}>
+                <Pencil className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">📱 {info.phone || "－"}</p>
+          </>
+        ) : (
+          <>
+            <input
+              type="text"
+              name="memberName"
+              className="input input-bordered w-full mb-2"
+              value={form.memberName}
+              onChange={handleChange}
+            />
+            <input
+              type="tel"
+              name="phone"
+              className="input input-bordered w-full"
+              placeholder="輸入電話"
+              value={form.phone}
+              onChange={handleChange}
+            />
+            <button className="btn btn-primary mt-4 w-full" onClick={handleSubmit}>
+              儲存修改
+            </button>
+          </>
+        )}
       </div>
+
       <div className="mt-6 space-y-2">
         <div className="flex justify-between">
           <span>訂購方案</span>
