@@ -166,6 +166,8 @@ async function createOrder(payload) {
   const orderId = uuidv4();
   const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
+  const itemsText = items.map(it => `${it.name} * ${it.qty}`).join("、");
+
   const row = [
     orderId,
     member.memberId,
@@ -175,7 +177,7 @@ async function createOrder(payload) {
     recipient || "",
     address || "",
     paymentMethod,
-    JSON.stringify(items),
+    itemsText,
     String(subtotal),
     String(tax),
     String(deliveryFee),

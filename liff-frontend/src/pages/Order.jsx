@@ -7,6 +7,8 @@ export default function Order() {
   const [member, setMember] = useState(null);
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState({});
+  const [recipient, setRecipient] = useState("");
+  const [address, setAddress] = useState("");
 
   useEffect(() => {
     const init = async () => {
@@ -22,6 +24,7 @@ export default function Order() {
       if (!resMember.ok) return;
       const m = await resMember.json();
       setMember(m);
+      setRecipient(m.memberName || "");
 
       const resProd = await fetch(`${apiBase}/api/products`);
       if (!resProd.ok) return;
@@ -55,8 +58,8 @@ export default function Order() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lineId: member.lineId,
-          recipient: member.memberName,
-          address: "台北市某某路100號",
+          recipient: recipient || member.memberName,
+          address,
           orders,
           paymentMethod: "CASH",
           desiredDate: new Date().toISOString().slice(0, 10),
@@ -75,36 +78,36 @@ export default function Order() {
     <div className="max-w-5xl mx-auto mt-6">
       <h2 className="text-xl font-bold mb-4">選擇商品</h2>
 
-      <div className="carousel rounded-box space-x-4">
+      <div className="mb-4 space-y-2">
+        <input
+          type="text"
+          placeholder="收件人"
+          className="input input-bordered w-full"
+          value={recipient}
+          onChange={(e) => setRecipient(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="地址"
+          className="input input-bordered w-full"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+      </div>
+
+      <div className="carousel w-full space-x-4 rounded-box">
         {products.map((p) => (
-          <div
-            key={p.productId}
-            className="carousel-item flex flex-col items-center"
-          >
+          <div key={p.productId} className="carousel-item w-72 flex flex-col items-center">
             <div className="w-64 h-40 bg-white border flex items-center justify-center">
               <span className="text-gray-400">商品圖片</span>
             </div>
-
             <div className="mt-2 font-semibold">{p.productName}</div>
             <div className="text-sm text-gray-500">NT$ {p.price}</div>
             <div className="text-xs text-gray-400">{p.category}</div>
-
             <div className="flex items-center mt-2">
-              <button
-                className="btn btn-circle btn-outline"
-                onClick={() => updateQty(p.productId, -1)}
-              >
-                -
-              </button>
-              <span className="mx-4 text-lg font-bold">
-                {cart[p.productId] || 0} 組
-              </span>
-              <button
-                className="btn btn-circle btn-outline"
-                onClick={() => updateQty(p.productId, 1)}
-              >
-                +
-              </button>
+              <button className="btn btn-circle btn-outline" onClick={() => updateQty(p.productId, -1)}>-</button>
+              <span className="mx-4 text-lg font-bold">{cart[p.productId] || 0} 組</span>
+              <button className="btn btn-circle btn-outline" onClick={() => updateQty(p.productId, 1)}>+</button>
             </div>
           </div>
         ))}
@@ -122,23 +125,19 @@ export default function Order() {
           <tbody>
             {Object.entries(cart).filter(([_, g]) => g > 0).length === 0 ? (
               <tr>
-                <td colSpan="3" className="text-center text-gray-500">
-                  尚未選擇商品
-                </td>
+                <td colSpan="3" className="text-center text-gray-500">尚未選擇商品</td>
               </tr>
             ) : (
-              Object.entries(cart)
-                .filter(([_, g]) => g > 0)
-                .map(([pid, groups]) => {
-                  const prod = products.find((p) => p.productId === pid);
-                  return (
-                    <tr key={pid}>
-                      <td>{prod ? prod.productName : pid}</td>
-                      <td>{groups}</td>
-                      <td>{groups * 6}</td>
-                    </tr>
-                  );
-                })
+              Object.entries(cart).filter(([_, g]) => g > 0).map(([pid, groups]) => {
+                const prod = products.find((p) => p.productId === pid);
+                return (
+                  <tr key={pid}>
+                    <td>{prod ? prod.productName : pid}</td>
+                    <td>{groups}</td>
+                    <td>{groups * 6}</td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -146,9 +145,7 @@ export default function Order() {
 
       <div className="mt-6 flex justify-between items-center">
         <div className="text-lg font-bold">總數量: {totalCount}</div>
-        <button className="btn btn-primary" onClick={handleSubmit}>
-          送出訂單
-        </button>
+        <button className="btn btn-primary" onClick={handleSubmit}>送出訂單</button>
       </div>
     </div>
   );
