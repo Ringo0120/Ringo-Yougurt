@@ -11,6 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dicebear/collection": "^9.2.4",
+    "@dicebear/core": "^9.2.4",
     "@line/liff": "^2.27.2",
     "daisyui": "^4.12.24",
     "lucide-react": "^0.544.0",

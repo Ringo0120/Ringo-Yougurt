@@ -5,8 +5,8 @@ const dayjs = require("dayjs");
 const credentials = JSON.parse(
   Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, "base64").toString()
 );
-const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
+const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_RANGE = "會員資料!A2:N";
 const HEADERS = [
   "memberId",
@@ -23,6 +23,7 @@ const HEADERS = [
   "bankAccount",
   "remainFreeQuota",
   "totalDeliveryFee",
+  "avatar"
 ];
 
 const {
@@ -32,6 +33,8 @@ const {
   BASIC_CUPS,
   PaymentStatus,
 } = require("../constants/constants");
+
+const seed = Math.random().toString(36).substring(2, 10);
 
 async function getSheetsClient() {
   const auth = new google.auth.GoogleAuth({
@@ -55,9 +58,11 @@ async function getAllMembers() {
   });
 
   const rows = res.data.values || [];
-  return rows.map((row) => Object.fromEntries(
-    HEADERS.map((h, i) => [h, row[i] || ""])
-  ));
+  return rows.map((row) => {
+    const obj = Object.fromEntries(HEADERS.map((h, i) => [h, row[i] || ""]));
+    if (!obj.avatar) obj.avatar = "Jack";
+    return obj;
+  });
 }
 
 async function getMemberById(memberId) {
@@ -99,6 +104,7 @@ async function createMember( lineId, memberName, phone) {
     "",
     remainFreeQuota.toString(),
     "0",
+    seed,
   ];
 
   await sheets.spreadsheets.values.append({

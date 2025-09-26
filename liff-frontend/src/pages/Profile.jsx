@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import liff from "@line/liff";
 import { Pencil } from "lucide-react";
+import { createAvatar } from "@dicebear/core";
+import { lorelei } from "@dicebear/collection";
 import Alert from "../components/Alert";
 
 const apiBase = import.meta.env.VITE_API_BASE;
@@ -11,6 +13,10 @@ export default function Profile() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ memberName: "", phone: "" });
   const [showAlert, setShowAlert] = useState(false);
+
+  const avatarSvg = info?.avatar
+    ? createAvatar(lorelei, { seed: info.avatar }).toString()
+    : "";
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -58,6 +64,27 @@ export default function Profile() {
     }
   };
 
+  const handleChangeAvatar = async () => {
+    if (!info?.memberId) return;
+
+    const newSeed = Math.random().toString(36).substring(2, 10);
+
+    try {
+      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatar: newSeed }),
+      });
+      if (!res.ok) throw new Error("更新頭像失敗");
+
+      setInfo((prev) => ({ ...prev, avatar: newSeed }));
+    } catch (err) {
+      console.error("更新頭像失敗：", err);
+      alert("更新頭像失敗，請稍後再試。");
+    }
+  };
+
+
   if (loading) return <div className="text-center mt-12">載入中...</div>;
 
   if (!info) return <div className="text-center mt-12 text-red-500">查無會員資訊</div>;
@@ -67,7 +94,11 @@ export default function Profile() {
       {showAlert && <Alert message="會員資料已成功更新！" />}
 
       <div className="flex flex-col items-center">
-        <div className="w-24 h-24 rounded-full bg-white border border-gray-300 mb-4"></div>
+        <div
+          className="w-24 h-24 rounded-full border border-gray-300 mb-4 cursor-pointer"
+          onClick={handleChangeAvatar}
+          dangerouslySetInnerHTML={{ __html: avatarSvg }}
+        ></div>
 
         {!editing ? (
           <>
