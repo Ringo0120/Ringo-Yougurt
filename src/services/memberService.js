@@ -132,7 +132,7 @@ async function updateMember(memberId, updates = {}) {
     h in updates ? updates[h] : row[h] || ""
   );
 
-  const range = `會員資料!A${index + 2}:N${index + 2}`;
+  const range = `會員資料!A${index + 2}:O${index + 2}`;
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
