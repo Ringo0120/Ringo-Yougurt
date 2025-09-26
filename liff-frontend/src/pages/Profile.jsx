@@ -14,6 +14,9 @@ export default function Profile() {
   const [form, setForm] = useState({ memberName: "", phone: "" });
   const [showAlert, setShowAlert] = useState(false);
 
+
+  console.log(info);
+
   const avatarSvg = info?.avatar
     ? createAvatar(lorelei, { seed: info.avatar }).toString()
     : "";
