@@ -72,6 +72,10 @@ async function handleEvent(event) {
   });
 }
 
+app.get("/ping", (req, res) => {
+  res.status(200).send("pong");
+});
+
 app.listen(process.env.PORT || 3000, () => {
   console.log(`yougurt backend is running on port ${process.env.PORT || 3000}`);
 });
