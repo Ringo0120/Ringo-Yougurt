@@ -52,7 +52,7 @@ export default function Profile() {
   const handleSubmit = async () => {
     if (!info?.memberId) return;
     try {
-      const res = await fetch(`${apiBase}/api/members/by-line/${info.lineId}`, {
+      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ memberName: form.memberName, phone: form.phone }),
@@ -67,13 +67,31 @@ export default function Profile() {
     }
   };
 
+  const handleSelectAvatar = async (seed) => {
+    if (!info?.memberId) return;
+    try {
+      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatar: seed }),
+      });
+      if (!res.ok) throw new Error("更新頭像失敗");
+
+      setInfo((prev) => ({ ...prev, avatar: seed }));
+      document.getElementById("avatar_modal").close();
+    } catch (err) {
+      console.error("更新頭像失敗：", err);
+      alert("更新頭像失敗，請稍後再試。");
+    }
+  };
+
   const handleChangeAvatar = async () => {
     if (!info?.memberId) return;
 
     const newSeed = Math.random().toString(36).substring(2, 10);
 
     try {
-      const res = await fetch(`${apiBase}/api/members/by-line/${info.lineId}`, {
+      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ avatar: newSeed }),
@@ -102,6 +120,30 @@ export default function Profile() {
           onClick={handleChangeAvatar}
           dangerouslySetInnerHTML={{ __html: avatarSvg }}
         ></div>
+
+        <dialog id="avatar_modal" className="modal">
+          <div className="modal-box max-w-3xl">
+            <form method="dialog">
+              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            <h3 className="font-bold text-lg mb-4">選擇頭像</h3>
+
+            <div className="grid grid-cols-3 gap-4">
+              {["Jack", "Liliana", "Chase", "Mackenzie", "Riley", "Emery", "Mason", "George",
+                "Sarah", "Andrea", "Aidan", "Wyatt", "Avery"].map((seed) => {
+                  const svg = createAvatar(lorelei, { seed }).toString();
+                  return (
+                    <div
+                      key={seed}
+                      className="cursor-pointer border rounded-full p-2 hover:bg-gray-100"
+                      onClick={() => handleSelectAvatar(seed)}
+                      dangerouslySetInnerHTML={{ __html: svg }}
+                    ></div>
+                  );
+                })}
+            </div>
+          </div>
+        </dialog>
 
         {!editing ? (
           <>
