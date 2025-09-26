@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
 import BindMember from "./pages/BindMember.jsx";
+import Order from "./pages/Order.jsx";
 import Profile from "./pages/Profile.jsx";
 import Cart from "./pages/Cart.jsx";
 import "./index.css";
@@ -15,8 +16,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/" element={<App />}>
           <Route index element={<Home />} />
           <Route path="bind-member" element={<BindMember />} />
-          <Route path="profile" element={<Profile />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="/order" element={<Order />} />
         </Route>
       </Routes>
     </HashRouter>
