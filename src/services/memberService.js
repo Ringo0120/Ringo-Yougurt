@@ -7,7 +7,7 @@ const credentials = JSON.parse(
 );
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
-const SHEET_RANGE = "會員資料!A2:N";
+const SHEET_RANGE = "會員資料!A2:O";
 const HEADERS = [
   "memberId",
   "memberName",
@@ -109,7 +109,7 @@ async function createMember( lineId, memberName, phone) {
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
-    range: "會員資料!A2:N",
+    range: "會員資料!A2:O",
     valueInputOption: "RAW",
     insertDataOption: "INSERT_ROWS",
     requestBody: {
