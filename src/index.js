@@ -13,12 +13,16 @@ app.use(express.json());
 app.use(cors());
 
 const client = new Client(config);
+
 const memberApi = require("./api/member");
-const { getByLineId } = require("./services/memberService");
+const orderApi = require("./api/order");
+const cartApi = require("./api/cart");
 
 app.use("/api/members", memberApi);
-app.use("/webhook", middleware(config));
+app.use("/api/orders", orderApi);
+app.use("/api/cart", cartApi);
 
+app.use("/webhook", middleware(config));
 app.post("/webhook", (req, res) => {
   Promise.all(req.body.events.map(handleEvent))
     .then((result) => res.json(result))

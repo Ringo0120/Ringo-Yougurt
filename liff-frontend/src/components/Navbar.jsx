@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import liff from "@line/liff";
 import { createAvatar } from "@dicebear/core";
@@ -9,6 +9,8 @@ const apiBase = import.meta.env.VITE_API_BASE;
 function Navbar() {
   const [info, setInfo] = useState(null);
   const [avatarSvg, setAvatarSvg] = useState("");
+  const [cart, setCart] = useState({ items: [], total: 0 });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -29,6 +31,8 @@ function Navbar() {
         const seed = data.avatar || "Jack";
         const svg = createAvatar(lorelei, { seed }).toString();
         setAvatarSvg(svg);
+
+        fetchCart(data.memberId);
       } catch (err) {
         console.error("Navbar 抓取會員資料失敗：", err);
       }
@@ -44,12 +48,25 @@ function Navbar() {
     };
 
     window.addEventListener("avatarUpdated", handleAvatarUpdate);
-
     return () => {
       window.removeEventListener("avatarUpdated", handleAvatarUpdate);
     };
   }, []);
 
+  const fetchCart = async (memberId) => {
+    try {
+      const res = await fetch(`${apiBase}/api/cart/${memberId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setCart(data);
+    } catch (err) {
+      console.error("抓購物車失敗：", err);
+    }
+  };
+
+  const handleViewCart = () => {
+    navigate("/cart");
+  };
 
   return (
     <div className="navbar bg-base-100 shadow-sm">
@@ -76,7 +93,11 @@ function Navbar() {
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-              <span className="badge badge-sm indicator-item">8</span>
+              {cart.items.length > 0 && (
+                <span className="badge badge-sm indicator-item">
+                  {cart.items.length}
+                </span>
+              )}
             </div>
           </div>
           <div
@@ -84,10 +105,12 @@ function Navbar() {
             className="card card-compact dropdown-content bg-base-100 z-1 mt-3 w-52 shadow"
           >
             <div className="card-body">
-              <span className="text-lg font-bold">8 Items</span>
-              <span className="text-info">Subtotal: $999</span>
+              <span className="text-lg font-bold">{cart.items.length} Items</span>
+              <span className="text-info">Subtotal: ${cart.total}</span>
               <div className="card-actions">
-                <button className="btn btn-primary btn-block">View cart</button>
+                <button className="btn btn-primary btn-block" onClick={handleViewCart}>
+                  View cart
+                </button>
               </div>
             </div>
           </div>
@@ -112,12 +135,6 @@ function Navbar() {
               <Link to="/profile" className="justify-between">
                 Profile
               </Link>
-            </li>
-            <li>
-              <a>Settings</a>
-            </li>
-            <li>
-              <a>Logout</a>
             </li>
           </ul>
         </div>
