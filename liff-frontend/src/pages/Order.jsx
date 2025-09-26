@@ -9,6 +9,7 @@ export default function Order() {
   const [cart, setCart] = useState({});
   const [recipient, setRecipient] = useState("");
   const [address, setAddress] = useState("");
+  const [desiredDate, setDesiredDate] = useState("");
 
   useEffect(() => {
     const init = async () => {
@@ -53,6 +54,9 @@ export default function Order() {
       Object.entries(cart).forEach(([pid, groups]) => {
         if (groups > 0) orders[pid] = groups * 6;
       });
+
+      const today = new Date().toISOString().slice(0, 10);
+
       const res = await fetch(`${apiBase}/api/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -62,7 +66,7 @@ export default function Order() {
           address,
           orders,
           paymentMethod: "CASH",
-          desiredDate: new Date().toISOString().slice(0, 10),
+          desiredDate: desiredDate || today,
         }),
       });
       const data = await res.json();
@@ -73,6 +77,11 @@ export default function Order() {
       alert("下訂失敗，請稍後再試。");
     }
   };
+
+  const today = new Date().toISOString().split("T")[0];
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 14);
+  const maxDateStr = maxDate.toISOString().split("T")[0];
 
   return (
     <div className="max-w-5xl mx-auto mt-6">
@@ -92,6 +101,15 @@ export default function Order() {
           className="input input-bordered w-full"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
+        />
+
+        <input
+          type="date"
+          className="input input-bordered w-full"
+          min={today}
+          max={maxDateStr}
+          value={desiredDate}
+          onChange={(e) => setDesiredDate(e.target.value)}
         />
       </div>
 
