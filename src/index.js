@@ -17,10 +17,12 @@ const client = new Client(config);
 const memberApi = require("./api/member");
 const orderApi = require("./api/order");
 const cartApi = require("./api/cart");
+const productApi = require("./api/product");
 
 app.use("/api/members", memberApi);
 app.use("/api/orders", orderApi);
 app.use("/api/cart", cartApi);
+app.use("/api/products", productApi);
 
 app.use("/webhook", middleware(config));
 app.post("/webhook", (req, res) => {
