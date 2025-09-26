@@ -77,11 +77,18 @@ export default function Order() {
 
       <div className="carousel rounded-box space-x-4">
         {products.map((p) => (
-          <div key={p.productId} className="carousel-item flex flex-col items-center">
-            <div className="w-64 h-40 bg-gray-200 flex items-center justify-center">
-              <span className="text-gray-500">圖片待補</span>
+          <div
+            key={p.productId}
+            className="carousel-item flex flex-col items-center"
+          >
+            <div className="w-64 h-40 bg-white border flex items-center justify-center">
+              <span className="text-gray-400">商品圖片</span>
             </div>
+
             <div className="mt-2 font-semibold">{p.productName}</div>
+            <div className="text-sm text-gray-500">NT$ {p.price}</div>
+            <div className="text-xs text-gray-400">{p.category}</div>
+
             <div className="flex items-center mt-2">
               <button
                 className="btn btn-circle btn-outline"
@@ -89,7 +96,9 @@ export default function Order() {
               >
                 -
               </button>
-              <span className="mx-4 text-lg font-bold">{cart[p.productId] || 0} 組</span>
+              <span className="mx-4 text-lg font-bold">
+                {cart[p.productId] || 0} 組
+              </span>
               <button
                 className="btn btn-circle btn-outline"
                 onClick={() => updateQty(p.productId, 1)}
