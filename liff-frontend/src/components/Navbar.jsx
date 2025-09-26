@@ -35,7 +35,21 @@ function Navbar() {
     };
 
     fetchMember();
+
+    const handleAvatarUpdate = (e) => {
+      const seed = e.detail;
+      const svg = createAvatar(lorelei, { seed }).toString();
+      setAvatarSvg(svg);
+      setInfo((prev) => ({ ...prev, avatar: seed }));
+    };
+
+    window.addEventListener("avatarUpdated", handleAvatarUpdate);
+
+    return () => {
+      window.removeEventListener("avatarUpdated", handleAvatarUpdate);
+    };
   }, []);
+
 
   return (
     <div className="navbar bg-base-100 shadow-sm">

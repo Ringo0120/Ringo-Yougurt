@@ -79,6 +79,8 @@ export default function Profile() {
 
       setInfo((prev) => ({ ...prev, avatar: seed }));
       document.getElementById("avatar_modal").close();
+
+      window.dispatchEvent(new CustomEvent("avatarUpdated", { detail: seed }));
     } catch (err) {
       console.error("更新頭像失敗：", err);
       alert("更新頭像失敗，請稍後再試。");
