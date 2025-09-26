@@ -52,7 +52,7 @@ export default function Profile() {
   const handleSubmit = async () => {
     if (!info?.memberId) return;
     try {
-      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
+      const res = await fetch(`${apiBase}/api/members/by-line/${info.lineId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ memberName: form.memberName, phone: form.phone }),
@@ -73,7 +73,7 @@ export default function Profile() {
     const newSeed = Math.random().toString(36).substring(2, 10);
 
     try {
-      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
+      const res = await fetch(`${apiBase}/api/members/by-line/${info.lineId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ avatar: newSeed }),
