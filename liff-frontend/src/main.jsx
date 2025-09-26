@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
 import BindMember from "./pages/BindMember.jsx";
 import Profile from "./pages/Profile.jsx";
+import Cart from "./pages/Cart.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route index element={<Home />} />
           <Route path="bind-member" element={<BindMember />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="/cart" element={<Cart />} />
         </Route>
       </Routes>
     </HashRouter>
