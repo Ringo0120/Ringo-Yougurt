@@ -101,6 +101,8 @@ export default function Profile() {
       if (!res.ok) throw new Error("更新頭像失敗");
 
       setInfo((prev) => ({ ...prev, avatar: newSeed }));
+
+      window.dispatchEvent(new CustomEvent("avatarUpdated", { detail: newSeed }));
     } catch (err) {
       console.error("更新頭像失敗：", err);
       alert("更新頭像失敗，請稍後再試。");
