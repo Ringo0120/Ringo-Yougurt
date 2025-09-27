@@ -1,6 +1,26 @@
 import { useEffect, useState } from "react";
 import liff from "@line/liff";
 
+import BlueberryImg from "../assets/images/products/TOP - Blueberry.png";
+import BrownSugarImg from "../assets/images/products/TOP - brownsugar longan.png";
+import HoneyImg from "../assets/images/products/TOP - Honey.png";
+import MangoImg from "../assets/images/products/TOP - Mango.png";
+import OrangeImg from "../assets/images/products/TOP - Orange.png";
+import PlainImg from "../assets/images/products/TOP - Plain.png";
+import RaspberryImg from "../assets/images/products/TOP - Raspberry.png";
+import StrawberryImg from "../assets/images/products/TOP - Strawberry.png";
+
+const productImages = {
+  "鮮奶希臘式濃縮優格": PlainImg,
+  "蜂蜜脆片希臘式濃縮優格": HoneyImg,
+  "藍莓希臘式濃縮優格": BlueberryImg,
+  "草莓希臘式濃縮優格": StrawberryImg,
+  "黑糖桂圓希臘式濃縮優格": BrownSugarImg,
+  "芒果希臘式濃縮優格": MangoImg,
+  "香柑希臘式濃縮優格": OrangeImg,
+  "覆盆子希臘式濃縮優格": RaspberryImg,
+};
+
 const apiBase = import.meta.env.VITE_API_BASE;
 
 export default function Order() {
@@ -116,8 +136,12 @@ export default function Order() {
       <div className="carousel w-full space-x-4 rounded-box">
         {products.map((p) => (
           <div key={p.productId} className="carousel-item w-72 flex flex-col items-center">
-            <div className="w-64 h-40 bg-white border flex items-center justify-center">
-              <span className="text-gray-400">商品圖片</span>
+            <div className="w-64 h-40 flex items-center justify-center">
+              <img
+                src={productImages[p.productName] || PlainImg}
+                alt={p.productName}
+                className="object-contain h-full"
+              />
             </div>
             <div className="mt-2 font-semibold">{p.productName}</div>
             <div className="text-sm text-gray-500">NT$ {p.price}</div>
