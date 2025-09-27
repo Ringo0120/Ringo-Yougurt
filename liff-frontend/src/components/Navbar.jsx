@@ -83,7 +83,7 @@ function Navbar() {
     <div className="navbar bg-base-100 shadow-sm">
       <div className="flex-1">
         <Link to="/" className="btn btn-ghost text-xl">
-          Yougurt
+          Ringo 品菓優格
         </Link>
       </div>
       <div className="flex-none">
