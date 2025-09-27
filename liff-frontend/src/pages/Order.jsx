@@ -127,6 +127,9 @@ export default function Order() {
       <h2 className="text-xl font-bold mb-4">選擇商品</h2>
 
       <div className="mb-4 space-y-2">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          收件人
+        </label>
         <input
           type="text"
           placeholder="收件人"
@@ -134,6 +137,9 @@ export default function Order() {
           value={recipient}
           onChange={(e) => setRecipient(e.target.value)}
         />
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          收貨地址
+        </label>
         <input
           type="text"
           placeholder="地址"
