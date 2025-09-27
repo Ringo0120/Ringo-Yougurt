@@ -117,12 +117,6 @@ export default function Cart() {
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                                 </svg>
-                                                品項：{order.orders || "－"}
-                                            </li>
-                                            <li>
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                                </svg>
                                                 收件人：{order.recipient || "－"}
                                             </li>
                                             <li>
@@ -131,19 +125,67 @@ export default function Cart() {
                                                 </svg>
                                                 地址：{order.address || "－"}
                                             </li>
-                                            <li>
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                出貨：{order.deliverStatus || "PREPARE"}
-                                            </li>
                                         </ul>
 
                                         <div className="mt-4">
-                                            <button className="btn btn-outline btn-sm btn-block">
+                                            <button
+                                                className="btn btn-outline btn-sm btn-block"
+                                                onClick={() =>
+                                                    document
+                                                        .getElementById(`order_modal_${idx}`)
+                                                        .showModal()
+                                                }
+                                            >
                                                 查看詳情
                                             </button>
                                         </div>
+
+                                        <dialog id={`order_modal_${idx}`} className="modal">
+                                            <div className="modal-box">
+                                                <form method="dialog">
+                                                    <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                                                        ✕
+                                                    </button>
+                                                </form>
+                                                <h3 className="font-bold text-lg mb-4">
+                                                    訂單詳情
+                                                </h3>
+                                                <ul className="space-y-2 text-sm">
+                                                    <li>
+                                                        <span className="font-semibold">訂單編號：</span>
+                                                        {order.orderId}
+                                                    </li>
+                                                    <li>
+                                                        <span className="font-semibold">下訂日期：</span>
+                                                        {order.orderDate}
+                                                    </li>
+                                                    <li>
+                                                        <span className="font-semibold">預計配送：</span>
+                                                        {order.desiredDate || "－"}
+                                                    </li>
+                                                    <li>
+                                                        <span className="font-semibold">收件人：</span>
+                                                        {order.recipient || "－"}
+                                                    </li>
+                                                    <li>
+                                                        <span className="font-semibold">地址：</span>
+                                                        {order.address || "－"}
+                                                    </li>
+                                                    <li>
+                                                        <span className="font-semibold">品項：</span>
+                                                        {order.orders || "－"}
+                                                    </li>
+                                                    <li>
+                                                        <span className="font-semibold">狀態：</span>
+                                                        {order.status || "－"} / {order.deliverStatus || "－"}
+                                                    </li>
+                                                    <li>
+                                                        <span className="font-semibold">總金額：</span>
+                                                        ${order.totalFee || 0}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </dialog>
                                     </div>
                                 </div>
                             </div>
