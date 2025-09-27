@@ -1,6 +1,6 @@
 export default function OrderCard({ order, index, isCompact = false }) {
   return (
-    <div className={`card ${isCompact ? "w-80" : "w-full"} bg-base-100 shadow-md`}>
+    <div className={`card ${isCompact ? "w-80" : "w-96"} bg-base-100 shadow-md`}>
       <div className="card-body">
         <div className="flex justify-between items-center">
           <span className="badge badge-sm badge-info">
