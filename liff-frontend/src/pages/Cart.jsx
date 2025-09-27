@@ -41,11 +41,11 @@ export default function Cart() {
     if (loading) return <div className="text-center mt-12">載入中...</div>;
 
     return (
-        <div className="max-w-4xl mx-auto mt-10 bg-base-200 p-6 rounded-lg shadow-md">
+        <div className="max-w-5xl mx-auto mt-10 p-6">
             <h2 className="text-xl font-bold mb-4">我的訂單</h2>
 
-            <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-                <table className="table">
+            <div className="hidden md:block overflow-x-auto rounded-box border border-base-content/5 bg-base-100 shadow">
+                <table className="table table-zebra">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -73,13 +73,9 @@ export default function Cart() {
                                     <td>{order.orderId.slice(-5)}</td>
                                     <td>{order.orderDate}</td>
                                     <td>{order.desiredDate || "－"}</td>
-                                    <td>
-                                        {Array.isArray(order.items)
-                                            ? order.items.map((it) => `${it.name} x${it.qty}`).join("、")
-                                            : ""}
-                                    </td>
+                                    <td className="whitespace-pre-line">{order.orders || "－"}</td>
                                     <td>{order.recipient || "－"}</td>
-                                    <td>{order.address || "－"}</td>
+                                    <td className="truncate max-w-xs">{order.address || "－"}</td>
                                     <td>{order.status || "－"}</td>
                                     <td>{order.deliverStatus || "－"}</td>
                                 </tr>
@@ -87,6 +83,25 @@ export default function Cart() {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="grid gap-4 md:hidden">
+                {orders.length === 0 ? (
+                    <div className="text-center text-gray-500">尚無訂單</div>
+                ) : (
+                    orders.map((order, idx) => (
+                        <div key={order.orderId} className="card bg-base-100 shadow-md p-4">
+                            <h3 className="font-bold">
+                                訂單 #{order.orderId.slice(-5)} ({order.orderDate})
+                            </h3>
+                            <p>預計配送：{order.desiredDate || "－"}</p>
+                            <p>品項：{order.orders || "－"}</p>
+                            <p>收件人：{order.recipient || "－"}</p>
+                            <p className="whitespace-pre-line">地址：{order.address || "－"}</p>
+                            <p>狀態：{order.status || "－"} / {order.deliverStatus || "－"}</p>
+                        </div>
+                    ))
+                )}
             </div>
 
             <Link
