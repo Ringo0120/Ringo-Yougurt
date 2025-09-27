@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import liff from "@line/liff";
+import { Link } from "react-router-dom";
 import OrderCarousel from "../components/OrderCarousel";
 
 const apiBase = import.meta.env.VITE_API_BASE;
