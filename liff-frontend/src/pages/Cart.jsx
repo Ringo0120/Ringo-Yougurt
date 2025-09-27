@@ -85,22 +85,28 @@ export default function Cart() {
                 </table>
             </div>
 
-            <div className="grid gap-4 md:hidden">
+            <div className="md:hidden">
                 {orders.length === 0 ? (
                     <div className="text-center text-gray-500">尚無訂單</div>
                 ) : (
-                    orders.map((order, idx) => (
-                        <div key={order.orderId} className="card bg-base-100 shadow-md p-4">
-                            <h3 className="font-bold">
-                                訂單 #{order.orderId.slice(-5)} ({order.orderDate})
-                            </h3>
-                            <p>預計配送：{order.desiredDate || "－"}</p>
-                            <p>品項：{order.orders || "－"}</p>
-                            <p>收件人：{order.recipient || "－"}</p>
-                            <p className="whitespace-pre-line">地址：{order.address || "－"}</p>
-                            <p>狀態：{order.status || "－"} / {order.deliverStatus || "－"}</p>
-                        </div>
-                    ))
+                    <div className="carousel w-full space-x-4 rounded-box">
+                        {orders.map((order, idx) => (
+                            <div key={order.orderId} className="carousel-item">
+                                <div className="card bg-base-100 shadow-md w-80 p-4">
+                                    <h3 className="font-bold mb-2">
+                                        訂單 #{order.orderId.slice(-5)} ({order.orderDate})
+                                    </h3>
+                                    <p className="text-sm">預計配送：{order.desiredDate || "－"}</p>
+                                    <p className="text-sm">品項：{order.orders || "－"}</p>
+                                    <p className="text-sm">收件人：{order.recipient || "－"}</p>
+                                    <p className="text-sm whitespace-pre-line">地址：{order.address || "－"}</p>
+                                    <p className="text-sm">
+                                        狀態：{order.status || "－"} / {order.deliverStatus || "－"}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 )}
             </div>
 
