@@ -70,7 +70,7 @@ export default function Cart() {
                             orders.map((order, idx) => (
                                 <tr key={order.orderId}>
                                     <td>{idx + 1}</td>
-                                    <td>{order.orderId}</td>
+                                    <td>{order.orderId.slice(-5)}</td>
                                     <td>{order.orderDate}</td>
                                     <td>{order.desiredDate || "－"}</td>
                                     <td>
