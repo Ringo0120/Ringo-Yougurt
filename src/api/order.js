@@ -33,6 +33,16 @@ router.get("/by-member/:memberId", async (req, res) => {
   }
 });
 
+router.get("/by-line/:lineId", async (req, res) => {
+  try {
+    const data = await orderService.getOrdersByMemberId(req.params.lineId);
+    res.json(data);
+  } catch (err) {
+    console.error("取得會員訂單失敗：", err);
+    res.status(500).json({ error: "取得會員訂單失敗" });
+  }
+});
+
 router.post("/", async (req, res) => {
   try {
     const order = await orderService.createOrder(req.body);

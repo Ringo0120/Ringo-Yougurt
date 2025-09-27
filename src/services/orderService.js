@@ -102,6 +102,11 @@ async function getOrdersByMemberId(memberId) {
     return all.filter((o) => o.memberId === memberId);
 }
 
+async function getOrdersByLineId(lineId) {
+    const all = await getAllOrders();
+    return all.filter((o) => o.lineId === lineId);
+}
+
 async function createOrder(payload) {
     const {
         lineId,
@@ -257,10 +262,10 @@ async function deleteOrder(orderId) {
 module.exports = {
     getAllProducts,
     getProductMap,
-
     getAllOrders,
     getOrderById,
     getOrdersByMemberId,
+    getOrdersByLineId,
     createOrder,
     updateOrder,
     deleteOrder,

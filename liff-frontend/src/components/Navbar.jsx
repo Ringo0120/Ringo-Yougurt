@@ -53,14 +53,25 @@ function Navbar() {
     };
   }, []);
 
-  const fetchCart = async (memberId) => {
+  const fetchCart = async (lineId) => {
     try {
-      const res = await fetch(`${apiBase}/api/cart/${memberId}`);
+      const res = await fetch(`${apiBase}/api/orders/by-line/${lineId}`);
       if (!res.ok) return;
+
       const data = await res.json();
-      setCart(data);
+
+      const itemsCount = data.length;
+
+      const totalAmount = data.reduce((sum, order) => {
+        return sum + (parseInt(order.totalFee, 10) || 0);
+      }, 0);
+
+      setCart({
+        items: data,
+        total: totalAmount,
+      });
     } catch (err) {
-      console.error("抓購物車失敗：", err);
+      console.error("抓會員訂單失敗：", err);
     }
   };
 
