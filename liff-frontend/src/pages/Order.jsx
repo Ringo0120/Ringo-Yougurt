@@ -161,6 +161,9 @@ export default function Order() {
         />
       </div>
 
+      <label className="block text-sm font-light text-gray-400 mb-1">
+        可以左右滑動選擇商品
+      </label>
       <div className="relative">
         <button
           onClick={scrollLeft}
