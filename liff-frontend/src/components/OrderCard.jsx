@@ -1,6 +1,6 @@
 export default function OrderCard({ order, index, isCompact = false }) {
   return (
-    <div className={`card ${isCompact ? "w-80" : "w-76"} bg-base-100 shadow-md`}>
+    <div className="card w-80 bg-base-100 shadow-md flex-shrink-0">
       <div className="card-body">
         <div className="flex justify-between items-center">
           <span className="badge badge-sm badge-info">
@@ -32,9 +32,7 @@ export default function OrderCard({ order, index, isCompact = false }) {
           <button
             className="btn btn-outline btn-sm btn-block"
             onClick={() =>
-              document
-                .getElementById(`order_modal_${index}`)
-                .showModal()
+              document.getElementById(`order_modal_${index}`).showModal()
             }
           >
             查看詳情
