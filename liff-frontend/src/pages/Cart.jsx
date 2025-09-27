@@ -49,6 +49,13 @@ export default function Cart() {
       ) : (
         <OrderCarousel orders={orders} />
       )}
+
+      <Link
+        to="/order"
+        className="btn btn-circle btn-primary fixed bottom-6 right-6 shadow-lg"
+      >
+        +
+      </Link>
     </div>
   );
 }
