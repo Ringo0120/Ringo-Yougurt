@@ -92,17 +92,59 @@ export default function Cart() {
                     <div className="carousel w-full space-x-4 rounded-box">
                         {orders.map((order, idx) => (
                             <div key={order.orderId} className="carousel-item">
-                                <div className="card bg-base-100 shadow-md w-80 p-4">
-                                    <h3 className="font-bold mb-2">
-                                        訂單 #{order.orderId.slice(-5)} ({order.orderDate})
-                                    </h3>
-                                    <p className="text-sm">預計配送：{order.desiredDate || "－"}</p>
-                                    <p className="text-sm">品項：{order.orders || "－"}</p>
-                                    <p className="text-sm">收件人：{order.recipient || "－"}</p>
-                                    <p className="text-sm whitespace-pre-line">地址：{order.address || "－"}</p>
-                                    <p className="text-sm">
-                                        狀態：{order.status || "－"} / {order.deliverStatus || "－"}
-                                    </p>
+                                <div className="card w-80 bg-base-100 shadow-sm">
+                                    <div className="card-body">
+                                        <div className="flex justify-between items-center">
+                                            <span className="badge badge-sm badge-info">
+                                                {order.status || "PENDING"}
+                                            </span>
+                                            <span className="text-xs text-gray-400">
+                                                #{order.orderId.slice(-5)}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex justify-between mt-2">
+                                            <h2 className="text-lg font-bold">
+                                                配送 {order.desiredDate || "－"}
+                                            </h2>
+                                            <span className="text-sm font-semibold text-primary">
+                                                ${order.totalFee || 0}
+                                            </span>
+                                        </div>
+
+                                        <ul className="mt-4 flex flex-col gap-2 text-sm">
+                                            <li>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                品項：{order.orders || "－"}
+                                            </li>
+                                            <li>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                收件人：{order.recipient || "－"}
+                                            </li>
+                                            <li>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                地址：{order.address || "－"}
+                                            </li>
+                                            <li>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                出貨：{order.deliverStatus || "PREPARE"}
+                                            </li>
+                                        </ul>
+
+                                        <div className="mt-4">
+                                            <button className="btn btn-outline btn-sm btn-block">
+                                                查看詳情
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
