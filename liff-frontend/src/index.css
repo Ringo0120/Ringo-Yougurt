@@ -1,3 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Rampart+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Rampart+One&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.font-rampart {
+    font-family: 'Rampart One', sans-serif;
+}
+
+.font-mochiy {
+    font-family: 'Mochiy Pop One', sans-serif;
+}
+
+.text-outline {
+  -webkit-text-stroke: 2px #add041;
+  color: white;
+}
