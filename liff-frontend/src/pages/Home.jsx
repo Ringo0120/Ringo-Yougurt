@@ -1,3 +1,5 @@
+import eatingYogurt from "../assets/images/landing/eating_yougurt.png";
+
 function Home() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-100 px-6">
@@ -16,9 +18,11 @@ function Home() {
         </div>
 
         <div className="flex items-center justify-center">
-          <div className="w-full h-64 bg-gray-100 rounded-lg border border-dashed border-gray-300 flex items-center justify-center text-gray-400">
-            預留圖片區域
-          </div>
+          <img
+            src={eatingYogurt}
+            alt="Eating Yogurt Illustration"
+            className="w-full h-auto max-w-md"
+          />
         </div>
       </div>
     </div>
