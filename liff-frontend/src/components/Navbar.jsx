@@ -116,11 +116,11 @@ function Navbar() {
             className="card card-compact dropdown-content bg-base-100 z-1 mt-3 w-52 shadow"
           >
             <div className="card-body">
-              <span className="text-lg font-bold">{cart.items.length} Items</span>
-              <span className="text-info">Subtotal: ${cart.total}</span>
+              <span className="text-lg font-bold">{cart.items.length} 筆訂單</span>
+              <span className="text-info">總費用：${cart.total}</span>
               <div className="card-actions">
                 <button className="btn btn-primary btn-block" onClick={handleViewCart}>
-                  View cart
+                  檢視訂購紀錄
                 </button>
               </div>
             </div>
@@ -144,7 +144,7 @@ function Navbar() {
           >
             <li>
               <Link to="/profile" className="justify-between">
-                Profile
+                個人檔案
               </Link>
             </li>
           </ul>
