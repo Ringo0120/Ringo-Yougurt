@@ -48,6 +48,7 @@ export default function Order() {
       const m = await resMember.json();
       setMember(m);
       setRecipient(m.memberName || "");
+      setAddress(m.address || "");
 
       const resProd = await fetch(`${apiBase}/api/products`);
       if (!resProd.ok) return;
