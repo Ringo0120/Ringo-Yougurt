@@ -12,6 +12,7 @@ import RaspberryImg from "../assets/images/products/TOP - Raspberry.png";
 import StrawberryImg from "../assets/images/products/TOP - Strawberry.png";
 
 import LoadingOverlay from "../components/LoadingOverlay";
+import OrderConfirmModal from "../components/OrderConfirmModal";
 
 const productImages = {
   "鮮奶希臘式濃縮優格": PlainImg,
@@ -34,6 +35,7 @@ export default function Order() {
   const [address, setAddress] = useState("");
   const [desiredDate, setDesiredDate] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const carouselRef = useRef(null);
   const navigate = useNavigate();
@@ -265,12 +267,28 @@ export default function Order() {
         <div className="text-lg font-bold">總數量: {totalCount}</div>
         <button
           className="btn btn-primary rounded-full text-[#ece9f0]"
-          onClick={handleSubmit}
+          onClick={() => setShowConfirm(true)}
           disabled={submitting}
         >
-          {submitting ? "處理中..." : "送出訂單"}
+          預覽訂單
         </button>
       </div>
+
+      <OrderConfirmModal
+        show={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={() => {
+          setShowConfirm(false);
+          handleSubmit();
+        }}
+        member={member}
+        recipient={recipient}
+        address={address}
+        desiredDate={desiredDate}
+        cart={cart}
+        products={products}
+        totalCount={totalCount}
+      />
     </div>
   );
 }
