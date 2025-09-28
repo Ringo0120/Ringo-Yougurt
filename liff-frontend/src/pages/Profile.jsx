@@ -39,11 +39,12 @@ export default function Profile() {
         });
         if (!res.ok) throw new Error("查無會員");
         const data = await res.json();
-        setInfo(data);
+        const member = data.member;
+        setInfo(member);
         setForm({
-          memberName: data.memberName,
-          phone: data.phone || "",
-          address: data.address || "",
+          memberName: member.memberName,
+          phone: member.phone || "",
+          address: member.address || "",
         });
       } catch (err) {
         console.error("查詢會員失敗：", err);
