@@ -101,7 +101,7 @@ export default function Members() {
       m.phone?.toLowerCase().includes(search.toLowerCase());
 
     const lineMatch = filterLine ? m.lineId : true;
-    const validMatch = filterValid ? m.validMember : true;
+    const validMatch = filterValid ? m.validMember === "是" : true;
 
     return searchMatch && lineMatch && validMatch;
   });
