@@ -134,7 +134,7 @@ export default function Order() {
         <input
           type="text"
           placeholder="收件人"
-          className="input input-bordered w-full"
+          className="input input-bordered w-full rounded-3xl"
           value={recipient}
           onChange={(e) => setRecipient(e.target.value)}
         />
@@ -144,7 +144,7 @@ export default function Order() {
         <input
           type="text"
           placeholder="地址"
-          className="input input-bordered w-full"
+          className="input input-bordered w-full rounded-3xl"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
         />
@@ -154,7 +154,7 @@ export default function Order() {
         </label>
         <input
           type="date"
-          className="input input-bordered w-full"
+          className="input input-bordered w-full rounded-3xl"
           min={today}
           max={maxDateStr}
           value={desiredDate}
@@ -252,7 +252,7 @@ export default function Order() {
 
       <div className="mt-6 flex justify-between items-center">
         <div className="text-lg font-bold">總數量: {totalCount}</div>
-        <button className="btn btn-primary rounded-2xl text-[#ece9f0]" onClick={handleSubmit}>送出訂單</button>
+        <button className="btn btn-primary rounded-full text-[#ece9f0]" onClick={handleSubmit}>送出訂單</button>
       </div>
     </div>
   );
