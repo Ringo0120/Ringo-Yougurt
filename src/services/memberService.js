@@ -7,7 +7,7 @@ const credentials = JSON.parse(
 );
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
-const SHEET_RANGE = "會員資料!A2:O";
+const SHEET_RANGE = "會員資料!A2:P";
 const HEADERS = [
   "memberId",
   "memberName",
@@ -23,7 +23,8 @@ const HEADERS = [
   "bankAccount",
   "remainFreeQuota",
   "totalDeliveryFee",
-  "avatar"
+  "avatar",
+  "address"
 ];
 
 const {
@@ -70,16 +71,8 @@ async function getMemberById(memberId) {
   return members.find((m) => m.memberId === memberId) || null;
 }
 
-async function createMember( lineId, memberName, phone) {
+async function createMember( lineId, memberName, phone, address = "") {
   const sheets = await getSheetsClient();
-
-  const {
-    BASIC_PRICE,
-    MONTHS,
-    BASIC_DELIVERY,
-    BASIC_CUPS,
-    PaymentStatus,
-  } = require("../constants/constants");
 
   const basicFee = BASIC_PRICE * (BASIC_DELIVERY - 1) * MONTHS;
   const balance = BASIC_PRICE * BASIC_DELIVERY * MONTHS;
@@ -105,11 +98,12 @@ async function createMember( lineId, memberName, phone) {
     remainFreeQuota.toString(),
     "0",
     seed,
+    address
   ];
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
-    range: "會員資料!A2:O",
+    range: "會員資料!A2:P",
     valueInputOption: "RAW",
     insertDataOption: "INSERT_ROWS",
     requestBody: {
@@ -132,7 +126,7 @@ async function updateMember(memberId, updates = {}) {
     h in updates ? updates[h] : row[h] || ""
   );
 
-  const range = `會員資料!A${index + 2}:O${index + 2}`;
+  const range = `會員資料!A${index + 2}:P${index + 2}`;
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
@@ -153,7 +147,7 @@ async function deleteMember(memberId) {
   const index = members.findIndex((m) => m.memberId === memberId);
   if (index === -1) throw new Error("Member not found");
 
-  const range = `會員資料!A${index + 2}:N${index + 2}`;
+  const range = `會員資料!A${index + 2}:P${index + 2}`;
 
   await sheets.spreadsheets.values.clear({
     spreadsheetId: SHEET_ID,

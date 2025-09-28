@@ -13,13 +13,13 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/create", async (req, res) => {
-  const { lineId, memberName, phone } = req.body;
+  const { lineId, memberName, phone, address } = req.body;
   try {
     const exists = await MemberService.checkMemberExists(memberName, phone);
     if (exists) {
       return res.status(400).json({ success: false, message: "會員已存在" });
     }
-    const memberId = await MemberService.createMember(lineId, memberName, phone);
+    const memberId = await MemberService.createMember(lineId, memberName, phone, address || "");
     res.status(201).json({ success: true, memberId });
   } catch (err) {
     console.error("新增會員失敗", err);
@@ -28,7 +28,7 @@ router.post("/create", async (req, res) => {
 });
 
 router.post("/login-or-bind", async (req, res) => {
-  const { lineId, displayName } = req.body;
+  const { lineId, displayName, address } = req.body;
   if (!lineId || !displayName) {
     return res.status(400).json({ success: false, message: "缺少 lineId 或 displayName" });
   }
@@ -39,7 +39,7 @@ router.post("/login-or-bind", async (req, res) => {
       return res.status(200).json({ success: true, member: existing });
     }
 
-    const memberId = await MemberService.createMember(lineId, displayName, "");
+    const memberId = await MemberService.createMember(lineId, displayName, "", address || "");
     const member = await MemberService.getByLineId(lineId);
     return res.status(201).json({ success: true, member });
   } catch (err) {

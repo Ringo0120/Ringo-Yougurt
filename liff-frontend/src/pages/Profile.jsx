@@ -32,7 +32,11 @@ export default function Profile() {
         if (!res.ok) throw new Error("查無會員");
         const data = await res.json();
         setInfo(data);
-        setForm({ memberName: data.memberName, phone: data.phone || "" });
+        setForm({
+          memberName: data.memberName,
+          phone: data.phone || "",
+          address: data.address || "",
+        });
       } catch (err) {
         console.error("查詢會員失敗：", err);
         setInfo(null);
@@ -55,7 +59,11 @@ export default function Profile() {
       const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberName: form.memberName, phone: form.phone }),
+        body: JSON.stringify({
+          memberName: form.memberName,
+          phone: form.phone,
+          address: form.address,
+        }),
       });
       if (!res.ok) throw new Error("更新失敗");
       setShowAlert(true);
@@ -158,6 +166,7 @@ export default function Profile() {
               </button>
             </div>
             <p className="text-sm text-gray-500 mb-4">{info.phone || "－"}</p>
+            <p className="text-sm text-gray-500 mb-4">{info.address || "－"}</p>
           </>
         ) : (
           <>
@@ -174,6 +183,14 @@ export default function Profile() {
               className="input input-bordered w-full"
               placeholder="輸入電話"
               value={form.phone}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="address"
+              className="input input-bordered w-full mt-2"
+              placeholder="輸入地址"
+              value={form.address}
               onChange={handleChange}
             />
             <button className="btn btn-primary mt-4 w-full" onClick={handleSubmit}>

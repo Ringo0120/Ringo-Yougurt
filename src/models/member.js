@@ -13,6 +13,10 @@ class Member {
     balance = 17160,
     validMember = false,
     bankAccount = "",
+    avatar = "Jack",
+    address = "",
+    
+    
   }) {
     this.memberId = memberId;
     this.lineId = lineId;
@@ -27,6 +31,8 @@ class Member {
     this.balance = balance;
     this.validMember = validMember;
     this.bankAccount = bankAccount;
+    this.address = address;
+    this.avatar = avatar;
   }
 }
 
