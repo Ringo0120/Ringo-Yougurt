@@ -232,7 +232,7 @@ export default function Order() {
           <p className="py-4">預計收貨日期不代表實際配送日期，實際以物流為準。</p>
           <div className="modal-action">
             <form method="dialog">
-              <button className="btn">了解</button>
+              <button className="btn rounded-full">了解</button>
             </form>
           </div>
         </div>
