@@ -28,7 +28,15 @@ export default function Profile() {
         const profile = await liff.getProfile();
         const lineId = profile.userId;
 
-        const res = await fetch(`${apiBase}/api/members/by-line/${lineId}`);
+        const res = await fetch(`${apiBase}/api/members/login-or-bind`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lineId,
+            displayName: profile.displayName,
+            address: "",
+          }),
+        });
         if (!res.ok) throw new Error("查無會員");
         const data = await res.json();
         setInfo(data);
