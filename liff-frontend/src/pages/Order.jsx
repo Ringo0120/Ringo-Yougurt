@@ -24,6 +24,7 @@ const productImages = {
   "香柑希臘式濃縮優格": OrangeImg,
   "覆盆子希臘式濃縮優格": RaspberryImg,
 };
+const hasShownDateNotice = useRef(false);
 
 const apiBase = import.meta.env.VITE_API_BASE;
 
@@ -79,6 +80,13 @@ export default function Order() {
 
   const handleSubmit = async () => {
     if (!member) return;
+
+    if (!hasShownDateNotice.current) {
+      document.getElementById("date_modal").showModal();
+      hasShownDateNotice.current = true;
+      return;
+    }
+
     setSubmitting(true);
     try {
       const orders = {};
@@ -130,7 +138,6 @@ export default function Order() {
 
   const handleDateChange = (e) => {
     setDesiredDate(e.target.value);
-    document.getElementById("date_modal").showModal();
   };
 
   return (
