@@ -128,7 +128,7 @@ export default function Order() {
       <h2 className="text-xl font-bold mb-4">選擇商品</h2>
 
       <div className="mb-4 space-y-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-lg font-medium text-gray-700 mb-1">
           收件人
         </label>
         <input
@@ -138,7 +138,7 @@ export default function Order() {
           value={recipient}
           onChange={(e) => setRecipient(e.target.value)}
         />
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-lg font-medium text-gray-700 mb-1">
           收貨地址
         </label>
         <input
@@ -149,7 +149,7 @@ export default function Order() {
           onChange={(e) => setAddress(e.target.value)}
         />
 
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-lg font-medium text-gray-700 mb-1">
           預計收貨日期
         </label>
         <input
@@ -162,7 +162,7 @@ export default function Order() {
         />
       </div>
 
-      <label className="block text-sm font-light text-gray-400 mb-1">
+      <label className="block text-base font-light text-gray-400 mb-1">
         可以左右滑動選擇商品
       </label>
       <div className="relative">
