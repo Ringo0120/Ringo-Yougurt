@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import liff from "@line/liff";
 import { Link } from "react-router-dom";
 import OrderCarousel from "../components/OrderCarousel";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 const apiBase = import.meta.env.VITE_API_BASE;
 
@@ -39,24 +40,27 @@ export default function Cart() {
     fetchOrders();
   }, []);
 
-  if (loading) return <div className="text-center mt-12">載入中...</div>;
-
   return (
-    <div className="max-w-6xl mx-auto mt-10 p-6">
-      <h2 className="text-xl font-bold mb-4">我的訂單</h2>
+    <div className="max-w-6xl mx-auto mt-10 p-6 relative">
+      <LoadingOverlay show={loading} />
+      {!loading && (
+        <>
+          <h2 className="text-xl font-bold mb-4">我的訂單</h2>
 
-      {orders.length === 0 ? (
-        <div className="text-center text-gray-500">尚無訂單</div>
-      ) : (
-        <OrderCarousel orders={orders} />
+          {orders.length === 0 ? (
+            <div className="text-center text-gray-500">尚無訂單</div>
+          ) : (
+            <OrderCarousel orders={orders} />
+          )}
+
+          <Link
+            to="/order"
+            className="btn btn-circle btn-primary fixed bottom-6 right-6 shadow-lg text-[#ece9f0]"
+          >
+            +
+          </Link>
+        </>
       )}
-
-      <Link
-        to="/order"
-        className="btn btn-circle btn-primary fixed bottom-6 right-6 shadow-lg text-[#ece9f0]"
-      >
-        +
-      </Link>
     </div>
   );
 }

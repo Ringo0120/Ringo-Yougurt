@@ -4,6 +4,7 @@ import { Pencil } from "lucide-react";
 import { createAvatar } from "@dicebear/core";
 import { lorelei } from "@dicebear/collection";
 import Alert from "../components/Alert";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 const apiBase = import.meta.env.VITE_API_BASE;
 
@@ -13,9 +14,6 @@ export default function Profile() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ memberName: "", phone: "" });
   const [showAlert, setShowAlert] = useState(false);
-
-
-  console.log(info);
 
   const avatarSvg = info?.avatar
     ? createAvatar(lorelei, { seed: info.avatar }).toString()
@@ -126,107 +124,108 @@ export default function Profile() {
     }
   };
 
-
-  if (loading) return <div className="text-center mt-12">載入中...</div>;
-
-  if (!info) return <div className="text-center mt-12 text-red-500">查無會員資訊</div>;
-
   return (
-    <div className="max-w-md mx-auto mt-10 bg-base-200 p-6 rounded-lg shadow-md">
-      {showAlert && <Alert message="會員資料已成功更新！" />}
+    <div className="relative max-w-md mx-auto mt-10 bg-base-200 p-6 rounded-lg shadow-md">
+      <LoadingOverlay show={loading} />
 
-      <div className="flex flex-col items-center">
-        <div
-          className="w-24 h-24 rounded-full border border-gray-300 mb-4 cursor-pointer"
-          onClick={handleChangeAvatar}
-          dangerouslySetInnerHTML={{ __html: avatarSvg }}
-        ></div>
+      {!loading && (
+        <>
+          {showAlert && <Alert message="會員資料已成功更新！" />}
 
-        <dialog id="avatar_modal" className="modal">
-          <div className="modal-box max-w-3xl">
-            <form method="dialog">
-              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-            </form>
-            <h3 className="font-bold text-lg mb-4">選擇頭像</h3>
+          <div className="flex flex-col items-center">
+            <div
+              className="w-24 h-24 rounded-full border border-gray-300 mb-4 cursor-pointer"
+              onClick={handleChangeAvatar}
+              dangerouslySetInnerHTML={{ __html: avatarSvg }}
+            ></div>
 
-            <div className="grid grid-cols-3 gap-4">
-              {["Jack", "Liliana", "Chase", "Mackenzie", "Riley", "Emery", "Mason", "George",
-                "Sarah", "Andrea", "Aidan", "Wyatt", "Avery"].map((seed) => {
-                  const svg = createAvatar(lorelei, { seed }).toString();
-                  return (
-                    <div
-                      key={seed}
-                      className="cursor-pointer border rounded-full p-2 hover:bg-gray-100"
-                      onClick={() => handleSelectAvatar(seed)}
-                      dangerouslySetInnerHTML={{ __html: svg }}
-                    ></div>
-                  );
-                })}
+            <dialog id="avatar_modal" className="modal">
+              <div className="modal-box max-w-3xl">
+                <form method="dialog">
+                  <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                </form>
+                <h3 className="font-bold text-lg mb-4">選擇頭像</h3>
+
+                <div className="grid grid-cols-3 gap-4">
+                  {["Jack", "Liliana", "Chase", "Mackenzie", "Riley", "Emery", "Mason", "George",
+                    "Sarah", "Andrea", "Aidan", "Wyatt", "Avery"].map((seed) => {
+                      const svg = createAvatar(lorelei, { seed }).toString();
+                      return (
+                        <div
+                          key={seed}
+                          className="cursor-pointer border rounded-full p-2 hover:bg-gray-100"
+                          onClick={() => handleSelectAvatar(seed)}
+                          dangerouslySetInnerHTML={{ __html: svg }}
+                        ></div>
+                      );
+                    })}
+                </div>
+              </div>
+            </dialog>
+
+            {!editing ? (
+              <>
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-xl font-bold">{info.memberName}</h2>
+                  <button onClick={() => setEditing(true)}>
+                    <Pencil className="w-4 h-4 text-gray-500" />
+                  </button>
+                </div>
+                <p className="text-sm text-gray-500 mb-4">{info.phone || "－"}</p>
+                <p className="text-sm text-gray-500 mb-4">{info.address || "－"}</p>
+              </>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  name="memberName"
+                  className="input input-bordered w-full mb-2 rounded-3xl"
+                  value={form.memberName}
+                  onChange={handleChange}
+                />
+                <input
+                  type="tel"
+                  name="phone"
+                  className="input input-bordered w-full rounded-3xl"
+                  placeholder="輸入電話"
+                  value={form.phone}
+                  onChange={handleChange}
+                />
+                <input
+                  type="text"
+                  name="address"
+                  className="input input-bordered w-full mt-2 rounded-3xl"
+                  placeholder="輸入地址"
+                  value={form.address}
+                  onChange={handleChange}
+                />
+                <button className="btn btn-primary mt-4 w-full rounded-3xl text-[#ece9f0]" onClick={handleSubmit}>
+                  儲存修改
+                </button>
+              </>
+            )}
+          </div>
+
+          <div className="mt-6 space-y-2">
+            <div className="flex justify-between">
+              <span>訂購方案</span>
+              <span className="font-semibold">{info.orderType || "－"}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>餘額</span>
+              <span className="font-semibold">${info.balance}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>剩餘運送次數</span>
+              <span className="font-semibold">{info.remainDelivery}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>剩餘免運次數</span>
+              <span className="font-semibold">{info.remainFreeQuota}</span>
             </div>
           </div>
-        </dialog>
-
-        {!editing ? (
-          <>
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-xl font-bold">{info.memberName}</h2>
-              <button onClick={() => setEditing(true)}>
-                <Pencil className="w-4 h-4 text-gray-500" />
-              </button>
-            </div>
-            <p className="text-sm text-gray-500 mb-4">{info.phone || "－"}</p>
-            <p className="text-sm text-gray-500 mb-4">{info.address || "－"}</p>
-          </>
-        ) : (
-          <>
-            <input
-              type="text"
-              name="memberName"
-              className="input input-bordered w-full mb-2 rounded-3xl"
-              value={form.memberName}
-              onChange={handleChange}
-            />
-            <input
-              type="tel"
-              name="phone"
-              className="input input-bordered w-full rounded-3xl"
-              placeholder="輸入電話"
-              value={form.phone}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="address"
-              className="input input-bordered w-full mt-2 rounded-3xl"
-              placeholder="輸入地址"
-              value={form.address}
-              onChange={handleChange}
-            />
-            <button className="btn btn-primary mt-4 w-full rounded-3xl text-[#ece9f0]" onClick={handleSubmit}>
-              儲存修改
-            </button>
-          </>
-        )}
-      </div>
-
-      <div className="mt-6 space-y-2">
-        <div className="flex justify-between">
-          <span>訂購方案</span>
-          <span className="font-semibold">{info.orderType || "－"}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>餘額</span>
-          <span className="font-semibold">${info.balance}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>剩餘運送次數</span>
-          <span className="font-semibold">{info.remainDelivery}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>剩餘免運次數</span>
-          <span className="font-semibold">{info.remainFreeQuota}</span>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }
