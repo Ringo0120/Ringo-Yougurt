@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import liff from "@line/liff";
 
 import BlueberryImg from "../assets/images/products/TOP - Blueberry.png";
@@ -9,6 +10,8 @@ import OrangeImg from "../assets/images/products/TOP - Orange.png";
 import PlainImg from "../assets/images/products/TOP - Plain.png";
 import RaspberryImg from "../assets/images/products/TOP - Raspberry.png";
 import StrawberryImg from "../assets/images/products/TOP - Strawberry.png";
+
+import LoadingOverlay from "../components/LoadingOverlay";
 
 const productImages = {
   "鮮奶希臘式濃縮優格": PlainImg,
@@ -30,8 +33,10 @@ export default function Order() {
   const [recipient, setRecipient] = useState("");
   const [address, setAddress] = useState("");
   const [desiredDate, setDesiredDate] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const carouselRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const init = async () => {
@@ -72,6 +77,7 @@ export default function Order() {
 
   const handleSubmit = async () => {
     if (!member) return;
+    setSubmitting(true);
     try {
       const orders = {};
       Object.entries(cart).forEach(([pid, groups]) => {
@@ -94,10 +100,12 @@ export default function Order() {
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
-      alert("下訂成功！");
+
+      navigate("/cart");
     } catch (err) {
       console.error("下訂失敗:", err);
       alert("下訂失敗，請稍後再試。");
+      setSubmitting(false);
     }
   };
 
@@ -124,13 +132,13 @@ export default function Order() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto mt-6">
+    <div className="relative max-w-5xl mx-auto mt-6">
+      <LoadingOverlay show={submitting} />
+
       <h2 className="text-xl font-bold mb-4">選擇商品</h2>
 
       <div className="mb-4 space-y-2">
-        <label className="block text-lg font-medium text-gray-700 mb-1">
-          收件人
-        </label>
+        <label className="block text-lg font-medium text-gray-700 mb-1">收件人</label>
         <input
           type="text"
           placeholder="收件人"
@@ -138,9 +146,8 @@ export default function Order() {
           value={recipient}
           onChange={(e) => setRecipient(e.target.value)}
         />
-        <label className="block text-lg font-medium text-gray-700 mb-1">
-          收貨地址
-        </label>
+
+        <label className="block text-lg font-medium text-gray-700 mb-1">收貨地址</label>
         <input
           type="text"
           placeholder="地址"
@@ -149,9 +156,7 @@ export default function Order() {
           onChange={(e) => setAddress(e.target.value)}
         />
 
-        <label className="block text-lg font-medium text-gray-700 mb-1">
-          預計收貨日期
-        </label>
+        <label className="block text-lg font-medium text-gray-700 mb-1">預計收貨日期</label>
         <input
           type="date"
           className="input input-bordered w-full rounded-3xl"
@@ -162,9 +167,7 @@ export default function Order() {
         />
       </div>
 
-      <label className="block text-base font-light text-gray-400 mb-1">
-        可以左右滑動選擇商品
-      </label>
+      <label className="block text-base font-light text-gray-400 mb-1">可以左右滑動選擇商品</label>
       <div className="relative">
         <button
           onClick={scrollLeft}
@@ -190,9 +193,19 @@ export default function Order() {
               <div className="text-lg text-gray-500">NT$ {p.price}</div>
               <div className="text-base text-gray-400">{p.category}</div>
               <div className="flex items-center mt-2">
-                <button className="btn btn-circle btn-outline" onClick={() => updateQty(p.productId, -1)}>-</button>
+                <button
+                  className="btn btn-circle btn-outline"
+                  onClick={() => updateQty(p.productId, -1)}
+                >
+                  -
+                </button>
                 <span className="mx-4 text-lg font-bold">{cart[p.productId] || 0} 組</span>
-                <button className="btn btn-circle btn-outline" onClick={() => updateQty(p.productId, 1)}>+</button>
+                <button
+                  className="btn btn-circle btn-outline"
+                  onClick={() => updateQty(p.productId, 1)}
+                >
+                  +
+                </button>
               </div>
             </div>
           ))}
@@ -209,9 +222,7 @@ export default function Order() {
       <dialog id="date_modal" className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg">提醒</h3>
-          <p className="py-4">
-            預計收貨日期不代表實際配送日期，實際以物流為準。
-          </p>
+          <p className="py-4">預計收貨日期不代表實際配送日期，實際以物流為準。</p>
           <div className="modal-action">
             <form method="dialog">
               <button className="btn">了解</button>
@@ -252,7 +263,13 @@ export default function Order() {
 
       <div className="mt-6 flex justify-between items-center">
         <div className="text-lg font-bold">總數量: {totalCount}</div>
-        <button className="btn btn-primary rounded-full text-[#ece9f0]" onClick={handleSubmit}>送出訂單</button>
+        <button
+          className="btn btn-primary rounded-full text-[#ece9f0]"
+          onClick={handleSubmit}
+          disabled={submitting}
+        >
+          {submitting ? "處理中..." : "送出訂單"}
+        </button>
       </div>
     </div>
   );

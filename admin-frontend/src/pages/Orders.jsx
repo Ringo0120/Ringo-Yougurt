@@ -1,276 +1,233 @@
-import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import liff from "@line/liff";
-
-import BlueberryImg from "../assets/images/products/TOP - Blueberry.png";
-import BrownSugarImg from "../assets/images/products/TOP - brownsugar longan.png";
-import HoneyImg from "../assets/images/products/TOP - Honey.png";
-import MangoImg from "../assets/images/products/TOP - Mango.png";
-import OrangeImg from "../assets/images/products/TOP - Orange.png";
-import PlainImg from "../assets/images/products/TOP - Plain.png";
-import RaspberryImg from "../assets/images/products/TOP - Raspberry.png";
-import StrawberryImg from "../assets/images/products/TOP - Strawberry.png";
-
-import LoadingOverlay from "../components/LoadingOverlay";
-
-const productImages = {
-  "鮮奶希臘式濃縮優格": PlainImg,
-  "蜂蜜脆片希臘式濃縮優格": HoneyImg,
-  "藍莓希臘式濃縮優格": BlueberryImg,
-  "草莓希臘式濃縮優格": StrawberryImg,
-  "黑糖桂圓希臘式濃縮優格": BrownSugarImg,
-  "芒果希臘式濃縮優格": MangoImg,
-  "香柑希臘式濃縮優格": OrangeImg,
-  "覆盆子希臘式濃縮優格": RaspberryImg,
-};
+import { useEffect, useState } from "react";
+import Layout from "../components/Layout";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import formatNumber from "../utils/format"
 
 const apiBase = import.meta.env.VITE_API_BASE;
 
-export default function Order() {
-  const [member, setMember] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState({});
-  const [recipient, setRecipient] = useState("");
-  const [address, setAddress] = useState("");
-  const [desiredDate, setDesiredDate] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+export default function Orders() {
+  const [orders, setOrders] = useState([]);
+  const [members, setMembers] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [tempDates, setTempDates] = useState({});
+  const [showCalendar, setShowCalendar] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  const carouselRef = useRef(null);
-  const navigate = useNavigate();
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${apiBase}/api/orders`);
+      if (!res.ok) throw new Error("查無訂單");
+      const data = await res.json();
+
+      const uniqueData = Array.from(
+        new Map(data.map((o) => [o.orderId, o])).values()
+      );
+      setOrders(uniqueData);
+
+      const initDates = {};
+      uniqueData.forEach((o) => {
+        initDates[o.orderId] = o.deliverDate ? new Date(o.deliverDate) : null;
+      });
+      setTempDates(initDates);
+
+      const memberIds = [...new Set(uniqueData.map((o) => o.memberId))];
+      const memberMap = {};
+      for (const id of memberIds) {
+        try {
+          const mRes = await fetch(`${apiBase}/api/members/${id}`);
+          if (mRes.ok) {
+            const mData = await mRes.json();
+            memberMap[id] = mData.memberName || mData.name || "";
+          }
+        } catch { }
+      }
+      setMembers(memberMap);
+
+      setCurrentPage(1);
+    } catch (err) {
+      console.error("取得訂單資料失敗", err);
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const init = async () => {
-      await liff.ready;
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
-      const profile = await liff.getProfile();
-      const lineId = profile.userId;
-
-      const resMember = await fetch(`${apiBase}/api/members/by-line/${lineId}`);
-      if (!resMember.ok) return;
-      const m = await resMember.json();
-      setMember(m);
-      setRecipient(m.memberName || "");
-      setAddress(m.address || "");
-
-      const resProd = await fetch(`${apiBase}/api/products`);
-      if (!resProd.ok) return;
-      const data = await resProd.json();
-      setProducts(data);
-    };
-    init();
+    fetchOrders();
   }, []);
 
-  const updateQty = (pid, delta) => {
-    setCart((prev) => {
-      const next = { ...prev, [pid]: Math.max((prev[pid] || 0) + delta, 0) };
-      return next;
-    });
-  };
-
-  const totalCount = Object.entries(cart).reduce(
-    (sum, [_, groups]) => sum + groups * 6,
-    0
-  );
-
-  const handleSubmit = async () => {
-    if (!member) return;
-    setSubmitting(true);
+  const updateOrder = async (orderId, updates) => {
     try {
-      const orders = {};
-      Object.entries(cart).forEach(([pid, groups]) => {
-        if (groups > 0) orders[pid] = groups * 6;
-      });
-
-      const today = new Date().toISOString().slice(0, 10);
-
-      const res = await fetch(`${apiBase}/api/orders`, {
-        method: "POST",
+      const res = await fetch(`${apiBase}/api/orders/${orderId}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lineId: member.lineId,
-          recipient: recipient || member.memberName,
-          address,
-          orders,
-          paymentMethod: "CASH",
-          desiredDate: desiredDate || today,
-        }),
+        body: JSON.stringify(updates),
       });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message);
-
-      navigate("/cart");
+      if (!res.ok) throw new Error("更新訂單失敗");
+      await fetchOrders();
     } catch (err) {
-      console.error("下訂失敗:", err);
-      alert("下訂失敗，請稍後再試。");
-      setSubmitting(false);
+      console.error(err);
+      alert("更新訂單失敗");
     }
   };
 
-  const today = new Date().toISOString().split("T")[0];
-  const maxDate = new Date();
-  maxDate.setDate(maxDate.getDate() + 14);
-  const maxDateStr = maxDate.toISOString().split("T")[0];
-
-  const scrollLeft = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: -300, behavior: "smooth" });
-    }
-  };
-
-  const scrollRight = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: 300, behavior: "smooth" });
-    }
-  };
-
-  const handleDateChange = (e) => {
-    setDesiredDate(e.target.value);
-    document.getElementById("date_modal").showModal();
-  };
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentOrders = orders.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="relative max-w-5xl mx-auto mt-6">
-      <LoadingOverlay show={submitting} />
-
-      <h2 className="text-xl font-bold mb-4">選擇商品</h2>
-
-      <div className="mb-4 space-y-2">
-        <label className="block text-lg font-medium text-gray-700 mb-1">收件人</label>
-        <input
-          type="text"
-          placeholder="收件人"
-          className="input input-bordered w-full rounded-3xl"
-          value={recipient}
-          onChange={(e) => setRecipient(e.target.value)}
-        />
-
-        <label className="block text-lg font-medium text-gray-700 mb-1">收貨地址</label>
-        <input
-          type="text"
-          placeholder="地址"
-          className="input input-bordered w-full rounded-3xl"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-
-        <label className="block text-lg font-medium text-gray-700 mb-1">預計收貨日期</label>
-        <input
-          type="date"
-          className="input input-bordered w-full rounded-3xl"
-          min={today}
-          max={maxDateStr}
-          value={desiredDate}
-          onChange={handleDateChange}
-        />
-      </div>
-
-      <label className="block text-base font-light text-gray-400 mb-1">可以左右滑動選擇商品</label>
-      <div className="relative">
-        <button
-          onClick={scrollLeft}
-          className="btn btn-circle absolute left-0 top-1/2 -translate-y-1/2 z-10"
-        >
-          ❮
-        </button>
-
-        <div
-          ref={carouselRef}
-          className="carousel w-full space-x-4 rounded-box overflow-x-auto scroll-smooth"
-        >
-          {products.map((p) => (
-            <div key={p.productId} className="carousel-item w-72 flex flex-col items-center">
-              <div className="w-64 h-40 flex items-center justify-center">
-                <img
-                  src={productImages[p.productName] || PlainImg}
-                  alt={p.productName}
-                  className="object-contain h-full"
-                />
-              </div>
-              <div className="mt-2 font-semibold">{p.productName}</div>
-              <div className="text-lg text-gray-500">NT$ {p.price}</div>
-              <div className="text-base text-gray-400">{p.category}</div>
-              <div className="flex items-center mt-2">
-                <button
-                  className="btn btn-circle btn-outline"
-                  onClick={() => updateQty(p.productId, -1)}
-                >
-                  -
-                </button>
-                <span className="mx-4 text-lg font-bold">{cart[p.productId] || 0} 組</span>
-                <button
-                  className="btn btn-circle btn-outline"
-                  onClick={() => updateQty(p.productId, 1)}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <button
-          onClick={scrollRight}
-          className="btn btn-circle absolute right-0 top-1/2 -translate-y-1/2 z-10"
-        >
-          ❯
-        </button>
-      </div>
-
-      <dialog id="date_modal" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">提醒</h3>
-          <p className="py-4">預計收貨日期不代表實際配送日期，實際以物流為準。</p>
-          <div className="modal-action">
-            <form method="dialog">
-              <button className="btn">了解</button>
-            </form>
-          </div>
-        </div>
-      </dialog>
-
-      <div className="mt-8 overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>商品</th>
-              <th>組數</th>
-              <th>數量 (顆)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(cart).filter(([_, g]) => g > 0).length === 0 ? (
+    <Layout>
+      <h1 className="text-2xl font-bold mb-4">訂單管理</h1>
+      {loading ? (
+        <div className="text-center text-gray-500">載入中...</div>
+      ) : (
+        <div className="max-w-6xl mx-auto overflow-x-auto">
+          <table className="table table-compact">
+            <thead>
               <tr>
-                <td colSpan="3" className="text-center text-gray-500">尚未選擇商品</td>
+                <th>#</th>
+                <th>訂單末五碼</th>
+                <th className="min-w-[100px]">訂購者</th>
+                <th className="min-w-[100px]">收貨人</th>
+                <th>訂單狀態</th>
+                <th className="min-w-[120px]">預計配送日期</th>
+                <th>出貨日期</th>
+                <th className="min-w-[110px]">貨品狀態</th>
+                <th>總金額</th>
+                <th>地址</th>
+                <th>操作</th>
               </tr>
-            ) : (
-              Object.entries(cart).filter(([_, g]) => g > 0).map(([pid, groups]) => {
-                const prod = products.find((p) => p.productId === pid);
-                return (
-                  <tr key={pid}>
-                    <td>{prod ? prod.productName : pid}</td>
-                    <td>{groups}</td>
-                    <td>{groups * 6}</td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {currentOrders.map((o, idx) => (
+                <tr key={`${o.orderId}-${idx}`}>
+                  <th>{startIndex + idx + 1}</th>
+                  <td>{o.orderId.slice(-5)}</td>
+                  <td>{members[o.memberId] || o.memberId}</td>
+                  <td>{o.recipient}</td>
+                  <td>{o.confirmedOrder}</td>
+                  <td>{o.desiredDate}</td>
+                  <td>
+                    <input
+                      readOnly
+                      value={
+                        tempDates[o.orderId]
+                          ? tempDates[o.orderId].toISOString().slice(0, 10)
+                          : ""
+                      }
+                      onClick={() => setShowCalendar(o.orderId)}
+                      className="input input-bordered input-xs w-[110px] rounded-full cursor-pointer"
+                      placeholder="選擇日期"
+                    />
+                    {showCalendar === o.orderId && (
+                      <div className="modal modal-open">
+                        <div className="modal-box">
+                          <h3 className="font-bold text-lg mb-2">選擇出貨日期</h3>
+                          <DatePicker
+                            inline
+                            selected={tempDates[o.orderId]}
+                            onChange={(date) =>
+                              setTempDates((prev) => ({
+                                ...prev,
+                                [o.orderId]: date,
+                              }))
+                            }
+                          />
+                          <div className="modal-action">
+                            <button
+                              className="btn rounded-full"
+                              onClick={() => setShowCalendar(null)}
+                            >
+                              取消
+                            </button>
+                            <button
+                              className="btn btn-primary rounded-full text-[#e5e9f0]"
+                              onClick={() => {
+                                updateOrder(o.orderId, {
+                                  deliverDate: tempDates[o.orderId]
+                                    ? tempDates[o.orderId]
+                                      .toISOString()
+                                      .slice(0, 10)
+                                    : "",
+                                });
+                                setShowCalendar(null);
+                              }}
+                            >
+                              確定
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </td>
+                  <td>
+                    <select
+                      className="select select-xs rounded-full border-2 border-[#4c566a]"
+                      value={o.deliverStatus}
+                      onChange={(e) =>
+                        updateOrder(o.orderId, {
+                          deliverStatus: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="PREPARE">準備中</option>
+                      <option value="DELIVERING">配送中</option>
+                      <option value="DELIVERED">已送達</option>
+                    </select>
+                  </td>
+                  <td>{formatNumber(o.totalFee)}</td>
+                  <td>{o.address}</td>
+                  <td className="flex gap-1">
+                    <button
+                      className="btn btn-xs btn-success text-[#eceff4] rounded-full"
+                      onClick={() =>
+                        updateOrder(o.orderId, { confirmedOrder: "接受" })
+                      }
+                    >
+                      接受
+                    </button>
+                    <button
+                      className="btn btn-xs btn-error text-[#eceff4] rounded-full"
+                      onClick={() =>
+                        updateOrder(o.orderId, { confirmedOrder: "取消" })
+                      }
+                    >
+                      取消
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      <div className="mt-6 flex justify-between items-center">
-        <div className="text-lg font-bold">總數量: {totalCount}</div>
-        <button
-          className="btn btn-primary rounded-full text-[#ece9f0]"
-          onClick={handleSubmit}
-          disabled={submitting}
-        >
-          {submitting ? "處理中..." : "送出訂單"}
-        </button>
-      </div>
-    </div>
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-4">
+              <button
+                className="btn btn-sm"
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                上一頁
+              </button>
+              <span>
+                第 {currentPage} / {totalPages} 頁
+              </span>
+              <button
+                className="btn btn-sm"
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+              >
+                下一頁
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </Layout>
   );
 }
