@@ -18,7 +18,7 @@ export default function OrderConfirmModal({
 
   const handleConfirm = () => {
     if (!recipient.trim() || !address.trim() || !desiredDate.trim() || totalCount === 0) {
-      setErrorMsg("請確認收件人、收件地址、預計收貨日期與商品內容皆已填寫。");
+      setErrorMsg("請確認寄件資訊皆已填寫。");
       setTimeout(() => setErrorMsg(""), 1000);
       return;
     }
@@ -75,7 +75,7 @@ export default function OrderConfirmModal({
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>{errorMsg}</span>
+            <span className="text-[#ece9f0]">{errorMsg}</span>
           </div>
         )}
 
