@@ -17,13 +17,23 @@ export default function OrderConfirmModal({
   if (!show) return null;
 
   const handleConfirm = () => {
-    if (!recipient.trim() || !address.trim() || !desiredDate.trim() || totalCount === 0) {
-      setErrorMsg("請確認寄件資訊皆已填寫。");
-      setTimeout(() => setErrorMsg(""), 1000);
+    const missingFields = [];
+
+    if (!recipient.trim()) missingFields.push("收件人");
+    if (!address.trim()) missingFields.push("收件地址");
+    if (!desiredDate.trim()) missingFields.push("預計收貨日期");
+    if (totalCount === 0) missingFields.push("商品數量");
+
+    if (missingFields.length > 0) {
+      const missingText = missingFields.join("、");
+      setErrorMsg(`${missingText} 不得為空`);
+      setTimeout(() => setErrorMsg(""), 2000);
       return;
     }
+
     onConfirm();
   };
+
 
   return (
     <dialog id="confirm_modal" className="modal modal-open">
