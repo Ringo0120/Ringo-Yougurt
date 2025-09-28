@@ -2,6 +2,16 @@ const express = require("express");
 const router = express.Router();
 const MemberService = require("../services/memberService");
 
+router.get("/", async (req, res) => {
+  try {
+    const members = await MemberService.getAllMembers();
+    res.json(members);
+  } catch (err) {
+    console.error("取得會員清單失敗", err);
+    res.status(500).json({ error: "取得會員清單資失敗" });
+  }
+});
+
 router.post("/create", async (req, res) => {
   const { lineId, memberName, phone } = req.body;
   try {

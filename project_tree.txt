@@ -1,0 +1,70 @@
+.
+├── Makefile
+├── db
+│   └── members.js
+├── liff-frontend
+│   ├── README.md
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.cjs
+│   ├── public
+│   │   ├── _redirects
+│   │   ├── favicon.ico
+│   │   └── vite.svg
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── assets
+│   │   │   ├── images
+│   │   │   │   ├── landing
+│   │   │   │   │   ├── eating_yougurt.png
+│   │   │   │   │   └── eating_yougurt.svg
+│   │   │   │   └── products
+│   │   │   │       ├── TOP - Blueberry.png
+│   │   │   │       ├── TOP - Honey.png
+│   │   │   │       ├── TOP - Mango.png
+│   │   │   │       ├── TOP - Orange.png
+│   │   │   │       ├── TOP - Plain.png
+│   │   │   │       ├── TOP - Raspberry.png
+│   │   │   │       ├── TOP - Strawberry.png
+│   │   │   │       └── TOP - brownsugar longan.png
+│   │   │   └── react.svg
+│   │   ├── components
+│   │   │   ├── Alert.jsx
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── OrderCard.jsx
+│   │   │   └── OrderCarousel.jsx
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   └── pages
+│   │       ├── BindMember.jsx
+│   │       ├── Cart.jsx
+│   │       ├── Home.jsx
+│   │       ├── Order.jsx
+│   │       └── Profile.jsx
+│   ├── static.json
+│   ├── tailwind.config.cjs
+│   └── vite.config.js
+├── package-lock.json
+├── package.json
+├── project_tree.txt
+└── src
+    ├── api
+    │   ├── cart.js
+    │   ├── member.js
+    │   ├── order.js
+    │   └── product.js
+    ├── constants
+    │   └── constants.js
+    ├── index.js
+    ├── models
+    │   ├── member.js
+    │   └── order.js
+    └── services
+        ├── calculateInvoice.js
+        ├── memberService.js
+        └── orderService.js
+
+16 directories, 52 files
