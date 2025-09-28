@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "./components/Navbar";
+import Layout from "./components/Layout";
 import liff from "@line/liff";
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
           return;
         }
 
-        const profile = await liff.getProfile();
+        await liff.getProfile();
       } catch (err) {
         console.error("LIFF 初始化失敗", err);
       }
@@ -24,12 +24,9 @@ function App() {
   }, []);
 
   return (
-    <>
-      <Navbar />
-      <div className="p-6">
-        <Outlet />
-      </div>
-    </>
+    <Layout>
+      <Outlet />
+    </Layout>
   );
 }
 
