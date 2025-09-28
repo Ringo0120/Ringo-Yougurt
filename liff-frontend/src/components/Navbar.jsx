@@ -60,8 +60,6 @@ function Navbar() {
 
       const data = await res.json();
 
-      const itemsCount = data.length;
-
       const totalAmount = data.reduce((sum, order) => {
         return sum + (parseInt(order.totalFee, 10) || 0);
       }, 0);
@@ -80,19 +78,20 @@ function Navbar() {
   };
 
   return (
-    <div className="navbar bg-base-100 shadow-sm">
+    <div className="navbar bg-base-100 shadow-sm fixed top-0 left-0 right-0 z-50">
       <div className="flex-1">
-        <Link to="/" className="btn btn-ghost text-xl">
-          Ringo 品菓希臘優格
+        <Link to="/" className="btn btn-ghost normal-case text-lg sm:text-xl font-bold">
+          Ringo 品菓優格
         </Link>
       </div>
-      <div className="flex-none">
+
+      <div className="flex-none flex items-center space-x-2">
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
             <div className="indicator">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className="h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -113,13 +112,16 @@ function Navbar() {
           </div>
           <div
             tabIndex={0}
-            className="card card-compact dropdown-content bg-base-100 z-1 mt-3 w-52 shadow"
+            className="card card-compact dropdown-content bg-base-100 z-[60] mt-3 w-52 shadow"
           >
             <div className="card-body">
               <span className="text-lg font-bold">{cart.items.length} 筆訂單</span>
               <span className="text-info">總費用：${cart.total}</span>
               <div className="card-actions">
-                <button className="btn btn-primary btn-block rounded-2xl text-[#ece9f0]" onClick={handleViewCart}>
+                <button
+                  className="btn btn-primary btn-block rounded-2xl text-[#ece9f0]"
+                  onClick={handleViewCart}
+                >
                   檢視訂購紀錄
                 </button>
               </div>
@@ -128,11 +130,7 @@ function Navbar() {
         </div>
 
         <div className="dropdown dropdown-end">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-ghost btn-circle avatar"
-          >
+          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
             <div
               className="w-10 rounded-full border"
               dangerouslySetInnerHTML={{ __html: avatarSvg }}
@@ -140,7 +138,7 @@ function Navbar() {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow"
           >
             <li>
               <Link to="/profile" className="justify-between">

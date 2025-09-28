@@ -25,7 +25,9 @@ function App() {
 
   return (
     <Layout>
-      <Outlet />
+      <div className="pt-16">
+        <Outlet />
+      </div>
     </Layout>
   );
 }
