@@ -252,7 +252,7 @@ export default function Order() {
 
       <div className="mt-6 flex justify-between items-center">
         <div className="text-lg font-bold">總數量: {totalCount}</div>
-        <button className="btn btn-primary text-[#ece9f0]" onClick={handleSubmit}>送出訂單</button>
+        <button className="btn btn-primary rounded-2xl text-[#ece9f0]" onClick={handleSubmit}>送出訂單</button>
       </div>
     </div>
   );

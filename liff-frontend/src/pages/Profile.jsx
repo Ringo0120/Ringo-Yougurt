@@ -173,14 +173,14 @@ export default function Profile() {
             <input
               type="text"
               name="memberName"
-              className="input input-bordered w-full mb-2"
+              className="input input-bordered w-full mb-2 rounded-3xl"
               value={form.memberName}
               onChange={handleChange}
             />
             <input
               type="tel"
               name="phone"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full rounded-3xl"
               placeholder="輸入電話"
               value={form.phone}
               onChange={handleChange}
@@ -188,12 +188,12 @@ export default function Profile() {
             <input
               type="text"
               name="address"
-              className="input input-bordered w-full mt-2"
+              className="input input-bordered w-full mt-2 rounded-3xl"
               placeholder="輸入地址"
               value={form.address}
               onChange={handleChange}
             />
-            <button className="btn btn-primary mt-4 w-full" onClick={handleSubmit}>
+            <button className="btn btn-primary mt-4 w-full rounded-3xl text-[#ece9f0]" onClick={handleSubmit}>
               儲存修改
             </button>
           </>
