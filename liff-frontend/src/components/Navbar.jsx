@@ -119,7 +119,7 @@ function Navbar() {
               <span className="text-lg font-bold">{cart.items.length} 筆訂單</span>
               <span className="text-info">總費用：${cart.total}</span>
               <div className="card-actions">
-                <button className="btn btn-primary btn-block" onClick={handleViewCart}>
+                <button className="btn btn-primary btn-block text-[#ece9f0]" onClick={handleViewCart}>
                   檢視訂購紀錄
                 </button>
               </div>

@@ -186,8 +186,8 @@ export default function Order() {
                 />
               </div>
               <div className="mt-2 font-semibold">{p.productName}</div>
-              <div className="text-sm text-gray-500">NT$ {p.price}</div>
-              <div className="text-xs text-gray-400">{p.category}</div>
+              <div className="text-lg text-gray-500">NT$ {p.price}</div>
+              <div className="text-base text-gray-400">{p.category}</div>
               <div className="flex items-center mt-2">
                 <button className="btn btn-circle btn-outline" onClick={() => updateQty(p.productId, -1)}>-</button>
                 <span className="mx-4 text-lg font-bold">{cart[p.productId] || 0} 組</span>
@@ -251,7 +251,7 @@ export default function Order() {
 
       <div className="mt-6 flex justify-between items-center">
         <div className="text-lg font-bold">總數量: {totalCount}</div>
-        <button className="btn btn-primary" onClick={handleSubmit}>送出訂單</button>
+        <button className="btn btn-primary text-[#ece9f0]" onClick={handleSubmit}>送出訂單</button>
       </div>
     </div>
   );

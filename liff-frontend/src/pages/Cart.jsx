@@ -53,7 +53,7 @@ export default function Cart() {
 
       <Link
         to="/order"
-        className="btn btn-circle btn-primary fixed bottom-6 right-6 shadow-lg"
+        className="btn btn-circle btn-primary fixed bottom-6 right-6 shadow-lg text-[#ece9f0]"
       >
         +
       </Link>
