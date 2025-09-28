@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 export default function OrderConfirmModal({
   show,
   onClose,
@@ -10,7 +12,18 @@ export default function OrderConfirmModal({
   products,
   totalCount,
 }) {
+  const [errorMsg, setErrorMsg] = useState("");
+
   if (!show) return null;
+
+  const handleConfirm = () => {
+    if (!recipient.trim() || !address.trim() || !desiredDate.trim() || totalCount === 0) {
+      setErrorMsg("請確認收件人、收件地址、預計收貨日期與商品內容皆已填寫。");
+      setTimeout(() => setErrorMsg(""), 1000);
+      return;
+    }
+    onConfirm();
+  };
 
   return (
     <dialog id="confirm_modal" className="modal modal-open">
@@ -23,8 +36,8 @@ export default function OrderConfirmModal({
         <div className="mb-4 text-sm">
           <p className="text-lg font-bold">收件資訊</p>
           <p className="text-base">訂購日期：{new Date().toLocaleDateString()}</p>
-          <p className="text-base">收件人：{recipient || member?.memberName}</p>
-          <p className="text-base">收件地址：{address}</p>
+          <p className="text-base">收件人：{recipient || member?.memberName || "未填寫"}</p>
+          <p className="text-base">收件地址：{address || "未填寫"}</p>
           <p className="text-base">預計收貨日期：{desiredDate || "未選擇"}</p>
         </div>
 
@@ -57,6 +70,15 @@ export default function OrderConfirmModal({
           </table>
         </div>
 
+        {errorMsg && (
+          <div role="alert" className="alert alert-error my-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
         <p className="text-xs text-gray-500">
           感謝您的訂購！實際配送以物流為準。
         </p>
@@ -65,7 +87,10 @@ export default function OrderConfirmModal({
           <button className="btn rounded-full" onClick={onClose}>
             返回修改
           </button>
-          <button className="btn btn-primary rounded-full text-[#ece9f0]" onClick={onConfirm}>
+          <button
+            className="btn btn-primary rounded-full text-[#ece9f0]"
+            onClick={handleConfirm}
+          >
             確認送出
           </button>
         </div>
