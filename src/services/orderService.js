@@ -159,10 +159,10 @@ async function createOrder(payload) {
     const row = [
         orderId,
         now,
-        "PENDING",
+        "待確認",
         desiredDate || "",
         "",
-        "PREPARE",
+        "備貨中",
         paymentMethod,
         member.memberId,
         itemsText,
@@ -205,8 +205,8 @@ async function createOrder(payload) {
         tax,
         deliveryFee,
         invoice,
-        status: "PENDING",
-        deliverStatus: "PREPARE",
+        status: "待確認",
+        deliverStatus: "備貨中",
     };
 }
 

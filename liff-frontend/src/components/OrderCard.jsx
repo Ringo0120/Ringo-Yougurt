@@ -4,7 +4,7 @@ export default function OrderCard({ order, index, isCompact = false }) {
       <div className="card-body">
         <div className="flex justify-between items-center">
           <span className="badge badge-sm badge-info">
-            {order.status || "PENDING"}
+            {order.status || "待確認"}
           </span>
           <span className="text-xs text-gray-400">
             #{order.orderId.slice(-5)}

@@ -12,8 +12,8 @@ class Order {
     totalFee = 0,
     invoice = 0,
     orderDate = new Date(),
-    status = "PENDING",
-    deliverStatus = "PREPARE"
+    status = "待確認",
+    deliverStatus = "備貨中"
   }) {
     this.orderId = orderId;
     this.memberId = memberId;

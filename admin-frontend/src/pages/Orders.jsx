@@ -173,7 +173,7 @@ export default function Orders() {
                         })
                       }
                     >
-                      <option value="PREPARE">準備中</option>
+                      <option value="PREPARE">備貨中</option>
                       <option value="DELIVERING">配送中</option>
                       <option value="DELIVERED">已送達</option>
                     </select>
