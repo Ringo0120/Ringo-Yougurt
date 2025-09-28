@@ -21,15 +21,15 @@ export default function OrderConfirmModal({
         <hr className="mb-4" />
 
         <div className="mb-4 text-sm">
-          <p className="font-bold">收件資訊</p>
-          <p>訂購日期：{new Date().toLocaleDateString()}</p>
-          <p>收件人：{recipient || member?.memberName}</p>
-          <p>收件地址：{address}</p>
-          <p>預計收貨日期：{desiredDate || "未選擇"}</p>
+          <p className="text-lg font-bold">收件資訊</p>
+          <p className="text-base">訂購日期：{new Date().toLocaleDateString()}</p>
+          <p className="text-base">收件人：{recipient || member?.memberName}</p>
+          <p className="text-base">收件地址：{address}</p>
+          <p className="text-base">預計收貨日期：{desiredDate || "未選擇"}</p>
         </div>
 
         <div className="mb-4 text-sm">
-          <p className="font-bold mb-2">訂單內容</p>
+          <p className="text-lg font-bold mb-2">訂單內容</p>
           <table className="table table-xs w-full">
             <thead>
               <tr>
@@ -62,10 +62,10 @@ export default function OrderConfirmModal({
         </p>
 
         <div className="modal-action">
-          <button className="btn" onClick={onClose}>
+          <button className="btn rounded-full" onClick={onClose}>
             返回修改
           </button>
-          <button className="btn btn-primary" onClick={onConfirm}>
+          <button className="btn btn-primary rounded-full text-[#ece9f0]" onClick={onConfirm}>
             確認送出
           </button>
         </div>
