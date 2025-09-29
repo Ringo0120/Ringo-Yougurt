@@ -7,6 +7,7 @@ import { lorelei } from "@dicebear/collection";
 import Alert from "../components/Alert";
 import LoadingOverlay from "../components/LoadingOverlay";
 import verifyPhone from "../utils/VerifyPhone";
+import cityCountyData from "../data/CityCountyData.json";
 
 const apiBase = import.meta.env.VITE_API_BASE;
 
@@ -14,7 +15,13 @@ export default function Profile() {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ memberName: "", phone: "", address: "" });
+  const [form, setForm] = useState({
+    memberName: "",
+    phone: "",
+    city: "",
+    area: "",
+    detailAddress: "",
+  });
   const [showAlert, setShowAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
 
@@ -44,11 +51,40 @@ export default function Profile() {
 
         const data = await res.json();
         const member = data.member;
+
+        let city = "";
+        let area = "";
+        let detailAddress = "";
+        if (member.address) {
+          const foundCity = cityCountyData.find((c) =>
+            member.address.startsWith(c.CityName)
+          );
+          if (foundCity) {
+            city = foundCity.CityName;
+            const foundArea = foundCity.AreaList.find((a) =>
+              member.address.includes(a.AreaName)
+            );
+            if (foundArea) {
+              area = foundArea.AreaName;
+              detailAddress = member.address
+                .replace(city, "")
+                .replace(area, "")
+                .trim();
+            } else {
+              detailAddress = member.address.replace(city, "").trim();
+            }
+          } else {
+            detailAddress = member.address;
+          }
+        }
+
         setInfo(member);
         setForm({
           memberName: member.memberName || "",
           phone: member.phone || "",
-          address: member.address || "",
+          city,
+          area,
+          detailAddress,
         });
 
         if (!member.memberName || !member.phone || !member.address) {
@@ -79,7 +115,9 @@ export default function Profile() {
   const handleSubmit = async () => {
     if (!info?.memberId) return;
 
-    if (!form.memberName || !form.address || !verifyPhone(form.phone)) {
+    const fullAddress = `${form.city}${form.area}${form.detailAddress}`;
+
+    if (!form.memberName || !verifyPhone(form.phone) || !fullAddress) {
       setShowErrorAlert(true);
       setEditing(true);
       return;
@@ -92,12 +130,12 @@ export default function Profile() {
         body: JSON.stringify({
           memberName: form.memberName,
           phone: form.phone,
-          address: form.address,
+          address: fullAddress,
         }),
       });
       if (!res.ok) throw new Error("更新失敗");
 
-      const updated = { ...info, ...form };
+      const updated = { ...info, ...form, address: fullAddress };
       setInfo(updated);
 
       setShowErrorAlert(false);
@@ -106,45 +144,6 @@ export default function Profile() {
     } catch (err) {
       console.error("更新會員失敗：", err);
       alert("更新失敗，請稍後再試。");
-    }
-  };
-
-  const handleSelectAvatar = async (seed) => {
-    if (!info?.memberId) return;
-    try {
-      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar: seed }),
-      });
-      if (!res.ok) throw new Error("更新頭像失敗");
-
-      setInfo((prev) => ({ ...prev, avatar: seed }));
-      document.getElementById("avatar_modal").close();
-
-      window.dispatchEvent(new CustomEvent("avatarUpdated", { detail: seed }));
-    } catch (err) {
-      console.error("更新頭像失敗：", err);
-      alert("更新頭像失敗，請稍後再試。");
-    }
-  };
-
-  const handleChangeAvatar = async () => {
-    if (!info?.memberId) return;
-    const newSeed = Math.random().toString(36).substring(2, 10);
-    try {
-      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar: newSeed }),
-      });
-      if (!res.ok) throw new Error("更新頭像失敗");
-
-      setInfo((prev) => ({ ...prev, avatar: newSeed }));
-      window.dispatchEvent(new CustomEvent("avatarUpdated", { detail: newSeed }));
-    } catch (err) {
-      console.error("更新頭像失敗：", err);
-      alert("更新頭像失敗，請稍後再試。");
     }
   };
 
@@ -178,34 +177,9 @@ export default function Profile() {
           <div className="flex flex-col items-center">
             <div
               className="w-24 h-24 rounded-full border border-gray-300 mb-4 cursor-pointer"
-              onClick={handleChangeAvatar}
+              onClick={() => setEditing(true)}
               dangerouslySetInnerHTML={{ __html: avatarSvg }}
             ></div>
-
-            <dialog id="avatar_modal" className="modal">
-              <div className="modal-box max-w-3xl">
-                <form method="dialog">
-                  <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                </form>
-                <h3 className="font-bold text-lg mb-4">選擇頭像</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    "Jack", "Liliana", "Chase", "Mackenzie", "Riley", "Emery",
-                    "Mason", "George", "Sarah", "Andrea", "Aidan", "Wyatt", "Avery"
-                  ].map((seed) => {
-                    const svg = createAvatar(lorelei, { seed }).toString();
-                    return (
-                      <div
-                        key={seed}
-                        className="cursor-pointer border rounded-full p-2 hover:bg-gray-100"
-                        onClick={() => handleSelectAvatar(seed)}
-                        dangerouslySetInnerHTML={{ __html: svg }}
-                      ></div>
-                    );
-                  })}
-                </div>
-              </div>
-            </dialog>
 
             {!editing ? (
               <>
@@ -216,7 +190,9 @@ export default function Profile() {
                   </button>
                 </div>
                 <p className="text-sm text-gray-500 mb-2">{info.phone || "－"}</p>
-                <p className="text-sm text-gray-500 mb-4">{info.address || "－"}</p>
+                <p className="text-sm text-gray-500 mb-4">
+                  {info.address || "－"}
+                </p>
               </>
             ) : (
               <>
@@ -231,19 +207,60 @@ export default function Profile() {
                 <input
                   type="tel"
                   name="phone"
-                  className="input input-bordered w-full rounded-3xl"
-                  placeholder="輸入電話"
+                  className={`input input-bordered w-full rounded-3xl mb-2 ${
+                    form.phone && !verifyPhone(form.phone) ? "input-error" : ""
+                  }`}
+                  placeholder="輸入電話（09 開頭 10 碼）"
                   value={form.phone}
                   onChange={handleChange}
                 />
+                {form.phone && !verifyPhone(form.phone) && (
+                  <p className="text-error text-sm mb-2">
+                    請輸入正確的手機號碼（09 開頭，共 10 碼）。
+                  </p>
+                )}
+
+                <select
+                  className="select select-bordered w-full mb-2 rounded-3xl"
+                  value={form.city}
+                  onChange={(e) =>
+                    setForm({ ...form, city: e.target.value, area: "" })
+                  }
+                >
+                  <option value="">選擇縣市</option>
+                  {cityCountyData.map((c) => (
+                    <option key={c.CityName} value={c.CityName}>
+                      {c.CityName}
+                    </option>
+                  ))}
+                </select>
+
+                {form.city && (
+                  <select
+                    className="select select-bordered w-full mb-2 rounded-3xl"
+                    value={form.area}
+                    onChange={(e) => setForm({ ...form, area: e.target.value })}
+                  >
+                    <option value="">選擇鄉鎮市區</option>
+                    {cityCountyData
+                      .find((c) => c.CityName === form.city)
+                      ?.AreaList.map((a) => (
+                        <option key={a.ZipCode} value={a.AreaName}>
+                          {a.AreaName}
+                        </option>
+                      ))}
+                  </select>
+                )}
+
                 <input
                   type="text"
-                  name="address"
-                  className="input input-bordered w-full mt-2 rounded-3xl"
-                  placeholder="輸入地址"
-                  value={form.address}
+                  name="detailAddress"
+                  className="input input-bordered w-full rounded-3xl"
+                  placeholder="輸入詳細地址"
+                  value={form.detailAddress}
                   onChange={handleChange}
                 />
+
                 <button
                   className="btn btn-primary mt-4 w-full rounded-3xl text-[#ece9f0]"
                   onClick={handleSubmit}
