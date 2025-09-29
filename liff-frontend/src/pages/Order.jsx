@@ -208,7 +208,7 @@ export default function Order() {
 
         <div
           ref={carouselRef}
-          className="carousel w-full space-x-4 rounded-box overflow-x-auto scroll-smooth"
+          className="carousel w-full space-x-4 rounded-box overflow-x-auto scroll-smooth flex justify-center"
         >
           {products.map((p) => (
             <div key={p.productId} className="carousel-item w-72 flex flex-col items-center">
