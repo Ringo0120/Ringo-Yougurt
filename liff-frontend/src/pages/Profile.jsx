@@ -32,6 +32,15 @@ export default function Profile() {
     : "";
 
   useEffect(() => {
+    if (showAlert) {
+      const timer = setTimeout(() => {
+        setShowAlert(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showAlert]);
+
+  useEffect(() => {
     const fetchMember = async () => {
       try {
         await liff.ready;
