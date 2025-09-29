@@ -6,6 +6,7 @@ import { createAvatar } from "@dicebear/core";
 import { lorelei } from "@dicebear/collection";
 import Alert from "../components/Alert";
 import LoadingOverlay from "../components/LoadingOverlay";
+import verifyPhone from "../utils/VerifyPhone";
 
 const apiBase = import.meta.env.VITE_API_BASE;
 
@@ -78,7 +79,7 @@ export default function Profile() {
   const handleSubmit = async () => {
     if (!info?.memberId) return;
 
-    if (!form.memberName || !form.phone || !form.address) {
+    if (!form.memberName || !form.address || !verifyPhone(form.phone)) {
       setShowErrorAlert(true);
       setEditing(true);
       return;
