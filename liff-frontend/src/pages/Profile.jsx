@@ -12,8 +12,9 @@ export default function Profile() {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ memberName: "", phone: "" });
+  const [form, setForm] = useState({ memberName: "", phone: "", address: "" });
   const [showAlert, setShowAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
 
   const avatarSvg = info?.avatar
     ? createAvatar(lorelei, { seed: info.avatar }).toString()
@@ -36,14 +37,19 @@ export default function Profile() {
           }),
         });
         if (!res.ok) throw new Error("查無會員");
+
         const data = await res.json();
         const member = data.member;
         setInfo(member);
         setForm({
-          memberName: member.memberName,
+          memberName: member.memberName || "",
           phone: member.phone || "",
           address: member.address || "",
         });
+
+        if (!member.memberName || !member.phone || !member.address) {
+          setShowErrorAlert(true);
+        }
       } catch (err) {
         console.error("查詢會員失敗：", err);
         setInfo(null);
@@ -74,6 +80,7 @@ export default function Profile() {
       });
       if (!res.ok) throw new Error("更新失敗");
       setShowAlert(true);
+      setShowErrorAlert(false);
       setEditing(false);
       setInfo((prev) => ({ ...prev, ...form }));
     } catch (err) {
@@ -104,9 +111,7 @@ export default function Profile() {
 
   const handleChangeAvatar = async () => {
     if (!info?.memberId) return;
-
     const newSeed = Math.random().toString(36).substring(2, 10);
-
     try {
       const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
         method: "PATCH",
@@ -116,7 +121,6 @@ export default function Profile() {
       if (!res.ok) throw new Error("更新頭像失敗");
 
       setInfo((prev) => ({ ...prev, avatar: newSeed }));
-
       window.dispatchEvent(new CustomEvent("avatarUpdated", { detail: newSeed }));
     } catch (err) {
       console.error("更新頭像失敗：", err);
@@ -132,6 +136,25 @@ export default function Profile() {
         <>
           {showAlert && <Alert message="會員資料已成功更新！" />}
 
+          {showErrorAlert && (
+            <div role="alert" className="alert alert-error mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 shrink-0 stroke-current"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>請填寫完整姓名、電話與地址，才能完成會員資料。</span>
+            </div>
+          )}
+
           <div className="flex flex-col items-center">
             <div
               className="w-24 h-24 rounded-full border border-gray-300 mb-4 cursor-pointer"
@@ -145,20 +168,21 @@ export default function Profile() {
                   <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                 </form>
                 <h3 className="font-bold text-lg mb-4">選擇頭像</h3>
-
                 <div className="grid grid-cols-3 gap-4">
-                  {["Jack", "Liliana", "Chase", "Mackenzie", "Riley", "Emery", "Mason", "George",
-                    "Sarah", "Andrea", "Aidan", "Wyatt", "Avery"].map((seed) => {
-                      const svg = createAvatar(lorelei, { seed }).toString();
-                      return (
-                        <div
-                          key={seed}
-                          className="cursor-pointer border rounded-full p-2 hover:bg-gray-100"
-                          onClick={() => handleSelectAvatar(seed)}
-                          dangerouslySetInnerHTML={{ __html: svg }}
-                        ></div>
-                      );
-                    })}
+                  {[
+                    "Jack","Liliana","Chase","Mackenzie","Riley","Emery",
+                    "Mason","George","Sarah","Andrea","Aidan","Wyatt","Avery"
+                  ].map((seed) => {
+                    const svg = createAvatar(lorelei, { seed }).toString();
+                    return (
+                      <div
+                        key={seed}
+                        className="cursor-pointer border rounded-full p-2 hover:bg-gray-100"
+                        onClick={() => handleSelectAvatar(seed)}
+                        dangerouslySetInnerHTML={{ __html: svg }}
+                      ></div>
+                    );
+                  })}
                 </div>
               </div>
             </dialog>
@@ -166,12 +190,12 @@ export default function Profile() {
             {!editing ? (
               <>
                 <div className="flex items-center gap-2 mb-1">
-                  <h2 className="text-xl font-bold">{info.memberName}</h2>
+                  <h2 className="text-xl font-bold">{info.memberName || "－"}</h2>
                   <button onClick={() => setEditing(true)}>
                     <Pencil className="w-4 h-4 text-gray-500" />
                   </button>
                 </div>
-                <p className="text-sm text-gray-500 mb-4">{info.phone || "－"}</p>
+                <p className="text-sm text-gray-500 mb-2">{info.phone || "－"}</p>
                 <p className="text-sm text-gray-500 mb-4">{info.address || "－"}</p>
               </>
             ) : (
@@ -180,6 +204,7 @@ export default function Profile() {
                   type="text"
                   name="memberName"
                   className="input input-bordered w-full mb-2 rounded-3xl"
+                  placeholder="輸入姓名"
                   value={form.memberName}
                   onChange={handleChange}
                 />
@@ -199,7 +224,10 @@ export default function Profile() {
                   value={form.address}
                   onChange={handleChange}
                 />
-                <button className="btn btn-primary mt-4 w-full rounded-3xl text-[#ece9f0]" onClick={handleSubmit}>
+                <button
+                  className="btn btn-primary mt-4 w-full rounded-3xl text-[#ece9f0]"
+                  onClick={handleSubmit}
+                >
                   儲存修改
                 </button>
               </>
