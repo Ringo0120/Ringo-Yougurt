@@ -47,8 +47,9 @@ export default function Profile() {
           address: member.address || "",
         });
 
-        if (!member.memberName || !member.phone || !member.address) {
+        if (!member.memberName && !member.phone && !member.address) {
           setShowErrorAlert(true);
+          setEditing(true);
         }
       } catch (err) {
         console.error("查詢會員失敗：", err);
@@ -79,10 +80,16 @@ export default function Profile() {
         }),
       });
       if (!res.ok) throw new Error("更新失敗");
+
+      const updated = { ...info, ...form };
+      setInfo(updated);
+
+      if (form.memberName && form.phone && form.address) {
+        setShowErrorAlert(false);
+        setEditing(false);
+      }
+
       setShowAlert(true);
-      setShowErrorAlert(false);
-      setEditing(false);
-      setInfo((prev) => ({ ...prev, ...form }));
     } catch (err) {
       console.error("更新會員失敗：", err);
       alert("更新失敗，請稍後再試。");
@@ -151,7 +158,7 @@ export default function Profile() {
                   d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span>請填寫完整姓名、電話與地址，才能完成會員資料。</span>
+              <span>請完整填寫姓名、電話與地址，才能繼續使用服務。</span>
             </div>
           )}
 

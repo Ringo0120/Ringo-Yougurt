@@ -51,20 +51,35 @@ export default function Order() {
       const profile = await liff.getProfile();
       const lineId = profile.userId;
 
-      const resMember = await fetch(`${apiBase}/api/members/by-line/${lineId}`);
+      const resMember = await fetch(`${apiBase}/api/members/login-or-bind`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lineId,
+          displayName: profile.displayName,
+          address: "",
+        }),
+      });
       if (!resMember.ok) return;
-      const m = await resMember.json();
+      const data = await resMember.json();
+      const m = data.member;
+
+      if (!m.memberName || !m.phone || !m.address) {
+        navigate("/profile");
+        return;
+      }
+
       setMember(m);
       setRecipient(m.memberName || "");
       setAddress(m.address || "");
 
       const resProd = await fetch(`${apiBase}/api/products`);
       if (!resProd.ok) return;
-      const data = await resProd.json();
-      setProducts(data);
+      const prodData = await resProd.json();
+      setProducts(prodData);
     };
     init();
-  }, []);
+  }, [navigate]);
 
   const updateQty = (pid, delta) => {
     setCart((prev) => {
@@ -77,6 +92,12 @@ export default function Order() {
     (sum, [_, groups]) => sum + groups * 6,
     0
   );
+
+  const totalAmount = Object.entries(cart).reduce((sum, [pid, groups]) => {
+    const prod = products.find((p) => p.productId === pid);
+    if (!prod) return sum;
+    return sum + prod.price * groups * 6;
+  }, 0);
 
   const handleSubmit = async () => {
     if (!member) return;
@@ -174,7 +195,9 @@ export default function Order() {
         />
       </div>
 
-      <label className="block text-base font-light text-gray-400 mb-1">可以左右滑動選擇商品</label>
+      <label className="block text-base font-light text-gray-400 mb-1">
+        可以左右滑動選擇商品
+      </label>
       <div className="relative">
         <button
           onClick={scrollLeft}
@@ -245,21 +268,24 @@ export default function Order() {
               <th>商品</th>
               <th>組數</th>
               <th>數量 (顆)</th>
+              <th>小計</th>
             </tr>
           </thead>
           <tbody>
             {Object.entries(cart).filter(([_, g]) => g > 0).length === 0 ? (
               <tr>
-                <td colSpan="3" className="text-center text-gray-500">尚未選擇商品</td>
+                <td colSpan="4" className="text-center text-gray-500">尚未選擇商品</td>
               </tr>
             ) : (
               Object.entries(cart).filter(([_, g]) => g > 0).map(([pid, groups]) => {
                 const prod = products.find((p) => p.productId === pid);
+                const subtotal = prod ? prod.price * groups * 6 : 0;
                 return (
                   <tr key={pid}>
                     <td>{prod ? prod.productName : pid}</td>
                     <td>{groups}</td>
                     <td>{groups * 6}</td>
+                    <td>NT$ {subtotal}</td>
                   </tr>
                 );
               })
@@ -269,7 +295,9 @@ export default function Order() {
       </div>
 
       <div className="mt-6 flex justify-between items-center">
-        <div className="text-lg font-bold">總數量: {totalCount}</div>
+        <div className="text-lg font-bold">
+          總數量: {totalCount}　金額: NT$ {totalAmount}
+        </div>
         <button
           className="btn btn-primary rounded-full text-[#ece9f0]"
           onClick={() => setShowConfirm(true)}
