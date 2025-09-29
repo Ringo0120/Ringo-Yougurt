@@ -77,6 +77,13 @@ export default function Profile() {
 
   const handleSubmit = async () => {
     if (!info?.memberId) return;
+
+    if (!form.memberName || !form.phone || !form.address) {
+      setShowErrorAlert(true);
+      setEditing(true);
+      return;
+    }
+
     try {
       const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
         method: "PATCH",
@@ -92,14 +99,8 @@ export default function Profile() {
       const updated = { ...info, ...form };
       setInfo(updated);
 
-      if (form.memberName && form.phone && form.address) {
-        setShowErrorAlert(false);
-        setEditing(false);
-      } else {
-        setShowErrorAlert(true);
-        setEditing(true);
-      }
-
+      setShowErrorAlert(false);
+      setEditing(false);
       setShowAlert(true);
     } catch (err) {
       console.error("更新會員失敗：", err);
