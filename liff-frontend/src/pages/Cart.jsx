@@ -36,7 +36,7 @@ export default function Cart() {
         const member = data.member;
 
         if (!member.memberName || !member.phone || !member.address) {
-          navigate("/profile");
+          navigate("/profile", { state: { forceEdit: true } });
           return;
         }
 

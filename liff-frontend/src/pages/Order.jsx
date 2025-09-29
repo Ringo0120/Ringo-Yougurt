@@ -65,7 +65,7 @@ export default function Order() {
       const m = data.member;
 
       if (!m.memberName || !m.phone || !m.address) {
-        navigate("/profile");
+        navigate("/profile", { state: { forceEdit: true } });
         return;
       }
 

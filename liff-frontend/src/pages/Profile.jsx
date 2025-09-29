@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import liff from "@line/liff";
 import { Pencil } from "lucide-react";
 import { createAvatar } from "@dicebear/core";
@@ -15,6 +16,8 @@ export default function Profile() {
   const [form, setForm] = useState({ memberName: "", phone: "", address: "" });
   const [showAlert, setShowAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+
+  const location = useLocation();
 
   const avatarSvg = info?.avatar
     ? createAvatar(lorelei, { seed: info.avatar }).toString()
@@ -47,7 +50,12 @@ export default function Profile() {
           address: member.address || "",
         });
 
-        if (!member.memberName && !member.phone && !member.address) {
+        if (!member.memberName || !member.phone || !member.address) {
+          setShowErrorAlert(true);
+          setEditing(true);
+        }
+
+        if (location.state?.forceEdit) {
           setShowErrorAlert(true);
           setEditing(true);
         }
@@ -60,7 +68,7 @@ export default function Profile() {
     };
 
     fetchMember();
-  }, []);
+  }, [location.state]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,6 +95,9 @@ export default function Profile() {
       if (form.memberName && form.phone && form.address) {
         setShowErrorAlert(false);
         setEditing(false);
+      } else {
+        setShowErrorAlert(true);
+        setEditing(true);
       }
 
       setShowAlert(true);
@@ -177,8 +188,8 @@ export default function Profile() {
                 <h3 className="font-bold text-lg mb-4">選擇頭像</h3>
                 <div className="grid grid-cols-3 gap-4">
                   {[
-                    "Jack","Liliana","Chase","Mackenzie","Riley","Emery",
-                    "Mason","George","Sarah","Andrea","Aidan","Wyatt","Avery"
+                    "Jack", "Liliana", "Chase", "Mackenzie", "Riley", "Emery",
+                    "Mason", "George", "Sarah", "Andrea", "Aidan", "Wyatt", "Avery"
                   ].map((seed) => {
                     const svg = createAvatar(lorelei, { seed }).toString();
                     return (
