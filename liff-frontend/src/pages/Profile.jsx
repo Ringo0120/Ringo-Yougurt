@@ -113,8 +113,13 @@ export default function Profile() {
   };
 
   const handleChangeAvatar = async () => {
-    if (!info?.memberId) return;
+    if (!info?.memberId) {
+      console.log("⚠️ 尚未取得會員資料，無法更換頭像");
+      return;
+    }
+
     const newSeed = Math.random().toString(36).substring(2, 10);
+    console.log("🎲 產生新的 avatar seed:", newSeed);
 
     try {
       const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
@@ -122,11 +127,15 @@ export default function Profile() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ avatar: newSeed }),
       });
+
+      console.log("📡 API 回應狀態:", res.status);
+
       if (!res.ok) throw new Error("更新頭像失敗");
+
       setInfo((prev) => ({ ...prev, avatar: newSeed }));
+      console.log("✅ 頭像已更新到狀態");
     } catch (err) {
-      console.error("更新頭像失敗：", err);
-      alert("更新頭像失敗，請稍後再試。");
+      console.error("❌ 更新頭像失敗：", err);
     }
   };
 
@@ -221,9 +230,8 @@ export default function Profile() {
                 <input
                   type="tel"
                   name="phone"
-                  className={`input input-bordered w-full rounded-3xl mb-2 ${
-                    form.phone && !verifyPhone(form.phone) ? "input-error" : ""
-                  }`}
+                  className={`input input-bordered w-full rounded-3xl mb-2 ${form.phone && !verifyPhone(form.phone) ? "input-error" : ""
+                    }`}
                   placeholder="輸入手機（範例：0912345678）"
                   value={form.phone}
                   onChange={handleChange}
