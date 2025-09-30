@@ -27,15 +27,11 @@ export default function Profile() {
 
   const location = useLocation();
 
-  const avatarSvg = info?.avatar
-    ? createAvatar(lorelei, { seed: info.avatar }).toString()
-    : "";
+  const avatarSvg = createAvatar(lorelei, { seed: info?.avatar || "default" }).toString();
 
   useEffect(() => {
     if (showAlert) {
-      const timer = setTimeout(() => {
-        setShowAlert(false);
-      }, 2000);
+      const timer = setTimeout(() => setShowAlert(false), 2000);
       return () => clearTimeout(timer);
     }
   }, [showAlert]);
@@ -96,12 +92,7 @@ export default function Profile() {
           detailAddress,
         });
 
-        if (!member.memberName || !member.phone || !member.address) {
-          setShowErrorAlert(true);
-          setEditing(true);
-        }
-
-        if (location.state?.forceEdit) {
+        if (!member.memberName || !member.phone || !member.address || location.state?.forceEdit) {
           setShowErrorAlert(true);
           setEditing(true);
         }
@@ -123,7 +114,6 @@ export default function Profile() {
 
   const handleChangeAvatar = async () => {
     if (!info?.memberId) return;
-
     const newSeed = Math.random().toString(36).substring(2, 10);
 
     try {
@@ -133,7 +123,6 @@ export default function Profile() {
         body: JSON.stringify({ avatar: newSeed }),
       });
       if (!res.ok) throw new Error("更新頭像失敗");
-
       setInfo((prev) => ({ ...prev, avatar: newSeed }));
     } catch (err) {
       console.error("更新頭像失敗：", err);
@@ -143,7 +132,6 @@ export default function Profile() {
 
   const handleSubmit = async () => {
     if (!info?.memberId) return;
-
     const fullAddress = `${form.city}${form.area}${form.detailAddress}`;
 
     if (!form.memberName || !verifyPhone(form.phone) || !fullAddress) {
@@ -183,7 +171,6 @@ export default function Profile() {
       {!loading && (
         <>
           {showAlert && <Alert message="會員資料已成功更新！" />}
-
           {showErrorAlert && (
             <div role="alert" className="alert alert-error mb-4">
               <svg
@@ -219,9 +206,7 @@ export default function Profile() {
                   </button>
                 </div>
                 <p className="text-sm text-gray-500 mb-2">{info.phone || "－"}</p>
-                <p className="text-sm text-gray-500 mb-4">
-                  {info.address || "－"}
-                </p>
+                <p className="text-sm text-gray-500 mb-4">{info.address || "－"}</p>
               </>
             ) : (
               <>
@@ -236,8 +221,9 @@ export default function Profile() {
                 <input
                   type="tel"
                   name="phone"
-                  className={`input input-bordered w-full rounded-3xl mb-2 ${form.phone && !verifyPhone(form.phone) ? "input-error" : ""
-                    }`}
+                  className={`input input-bordered w-full rounded-3xl mb-2 ${
+                    form.phone && !verifyPhone(form.phone) ? "input-error" : ""
+                  }`}
                   placeholder="輸入手機（範例：0912345678）"
                   value={form.phone}
                   onChange={handleChange}
@@ -247,7 +233,6 @@ export default function Profile() {
                     請輸入正確的手機號碼（範例：0912345678）。
                   </p>
                 )}
-
                 <select
                   className="select select-bordered w-full mb-2 rounded-3xl"
                   value={form.city}
@@ -262,7 +247,6 @@ export default function Profile() {
                     </option>
                   ))}
                 </select>
-
                 {form.city && (
                   <select
                     className="select select-bordered w-full mb-2 rounded-3xl"
@@ -279,7 +263,6 @@ export default function Profile() {
                       ))}
                   </select>
                 )}
-
                 <input
                   type="text"
                   name="detailAddress"
@@ -288,7 +271,6 @@ export default function Profile() {
                   value={form.detailAddress}
                   onChange={handleChange}
                 />
-
                 <button
                   className="btn btn-primary mt-4 w-full rounded-3xl text-[#ece9f0]"
                   onClick={handleSubmit}
