@@ -121,6 +121,26 @@ export default function Profile() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleChangeAvatar = async () => {
+    if (!info?.memberId) return;
+
+    const newSeed = Math.random().toString(36).substring(2, 10);
+
+    try {
+      const res = await fetch(`${apiBase}/api/members/${info.memberId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatar: newSeed }),
+      });
+      if (!res.ok) throw new Error("更新頭像失敗");
+
+      setInfo((prev) => ({ ...prev, avatar: newSeed }));
+    } catch (err) {
+      console.error("更新頭像失敗：", err);
+      alert("更新頭像失敗，請稍後再試。");
+    }
+  };
+
   const handleSubmit = async () => {
     if (!info?.memberId) return;
 
@@ -186,7 +206,7 @@ export default function Profile() {
           <div className="flex flex-col items-center">
             <div
               className="w-24 h-24 rounded-full border border-gray-300 mb-4 cursor-pointer"
-              onClick={() => setEditing(true)}
+              onClick={handleChangeAvatar}
               dangerouslySetInnerHTML={{ __html: avatarSvg }}
             ></div>
 
@@ -216,16 +236,15 @@ export default function Profile() {
                 <input
                   type="tel"
                   name="phone"
-                  className={`input input-bordered w-full rounded-3xl mb-2 ${
-                    form.phone && !verifyPhone(form.phone) ? "input-error" : ""
-                  }`}
-                  placeholder="輸入電話（09 開頭 10 碼）"
+                  className={`input input-bordered w-full rounded-3xl mb-2 ${form.phone && !verifyPhone(form.phone) ? "input-error" : ""
+                    }`}
+                  placeholder="輸入手機（範例：0912345678）"
                   value={form.phone}
                   onChange={handleChange}
                 />
                 {form.phone && !verifyPhone(form.phone) && (
                   <p className="text-error text-sm mb-2">
-                    請輸入正確的手機號碼（09 開頭，共 10 碼）。
+                    請輸入正確的手機號碼（範例：0912345678）。
                   </p>
                 )}
 
